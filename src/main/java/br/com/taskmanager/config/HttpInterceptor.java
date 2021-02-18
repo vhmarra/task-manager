@@ -1,5 +1,7 @@
 package br.com.taskmanager.config;
 
+import br.com.taskmanager.domain.AccessToken;
+import br.com.taskmanager.exceptions.TokenNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -39,10 +41,22 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(new HttpInterceptor(requestInterceptor, repository))
                         .addPathPatterns("/**")
-                        .excludePathPatterns("/v2/api-docs","/swagger-resources/**","/swagger-ui.html", "/webjars/**","/auth/**");}};}
+                        .excludePathPatterns("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/auth/**");
+            }
+        };
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (request.getServletPath().contains("/task")) {
+            log.info("intercepting token {}",request.getHeader("access-token"));
+            AccessToken accessToken = repository.findByToken(request.getHeader("access-token")).orElse(null);
+            if(accessToken == null){
+                return false;
+            }
+            TokenThread.setToken(accessToken);
+            log.info("token {}",accessToken.getToken());
+        }
         return true;
     }
 

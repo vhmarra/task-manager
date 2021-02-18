@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @ControllerAdvice
 @Slf4j
@@ -33,6 +34,12 @@ public class RestExceptionInterceptor {
     public ResponseEntity<?> handleObjectAlreadyExistsException(Exception ex) {
         log.error(ex.getMessage(), ex);
         return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 400L),new HttpHeaders(), BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ TokenNotFoundException.class })
+    public ResponseEntity<?> handleTokenNotFoundException(Exception ex) {
+        log.error(ex.getMessage(), ex);
+        return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 403L),new HttpHeaders(), FORBIDDEN);
     }
 
 

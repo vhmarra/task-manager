@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,8 +25,11 @@ public class TaskEntity {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
+    @Column(name = "description")
+    private String taskDescription;
+
     @Column(name = "date_end")
-    private LocalDateTime dateEnd;
+    private LocalDate dateEnd;
 
     @Column(name = "finalized")
     private Boolean finalized;

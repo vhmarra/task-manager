@@ -11,6 +11,7 @@ public final class TokenThread {
     private TokenThread(){
         super();
     }
+
     public static void setToken(AccessToken token) {
         tClocal.set(token);
     }
