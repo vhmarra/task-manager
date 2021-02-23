@@ -1,8 +1,9 @@
 package br.com.taskmanager.service;
 
+import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.domain.ChangeUserDataEntity;
-import br.com.taskmanager.domain.Email;
+import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.repository.AccessTokenRepository;
@@ -44,11 +45,11 @@ public class ChangeUserDataService {
     public void requestChangePassword(String userCpf, String userEmailConfirm) throws InvalidInputException, MessagingException {
         UserEntity user = userRepository.findByCpf(userCpf).orElse(null);
 
-        if(user == null || !user.getEmail().equalsIgnoreCase(userEmailConfirm)){
+        if (user == null || !user.getEmail().equalsIgnoreCase(userEmailConfirm)) {
             throw new InvalidInputException("Dados invalidos");
         }
 
-        String code = DigestUtils.md2Hex(UUID.randomUUID().toString() + DigestUtils.sha256Hex(user.getEmail()+user.getName()) + DigestUtils.sha256(user.getName()+user.getEmail()));
+        String code = DigestUtils.md2Hex(UUID.randomUUID().toString() + DigestUtils.sha256Hex(user.getEmail() + user.getName()) + DigestUtils.sha256(user.getName() + user.getEmail()));
 
         ChangeUserDataEntity changeUserDataEntity = new ChangeUserDataEntity();
         changeUserDataEntity.setUser(user);
@@ -56,17 +57,17 @@ public class ChangeUserDataService {
         changeUserDataEntity.setDateCreated(LocalDateTime.now());
         changeUserDataEntity.setCode(code);
 
-        Email email = new Email();
+        EmailEntity email = new EmailEntity();
         email.setSented(1);
         email.setEmailSubject(CHANGE_PASSWORD_SUBJECT_EMAIL);
-        email.setMessage(CHANGE_PASSWORD_BODY_EMAIL.replace("user_name",user.getName()).replace("c_pass",code));
+        email.setMessage(CHANGE_PASSWORD_BODY_EMAIL.replace("user_name", user.getName()).replace("c_pass", code));
         email.setDateCreated(LocalDateTime.now());
         email.setDateSented(LocalDateTime.now());
         email.setEmailAddress(user.getEmail());
         email.setUser(user);
         email.setType(EmailTypeEnum.CHANGE_PASSWORD);
 
-        emailService.sendEmail(email.getEmailAddress(),email.getUser().getName(),email.getEmailSubject(),email.getMessage());
+        emailService.sendEmail(email.getEmailAddress(), email.getUser().getName(), email.getEmailSubject(), email.getMessage());
 
         emailRepository.save(email);
         changeUserDataRepository.save(changeUserDataEntity);
@@ -76,7 +77,7 @@ public class ChangeUserDataService {
     public void changePassword(String code, String newPassword) throws InvalidInputException, MessagingException {
         ChangeUserDataEntity changeUserDataEntity = changeUserDataRepository.findByCode(code).orElse(null);
 
-        if(changeUserDataEntity == null || changeUserDataEntity.getUsed().equals(1)){
+        if (changeUserDataEntity == null || changeUserDataEntity.getUsed().equals(1)) {
             throw new InvalidInputException("Invalid code, try again!");
         }
 
@@ -86,19 +87,19 @@ public class ChangeUserDataService {
         changeUserDataEntity.setDateUsed(LocalDateTime.now());
         changeUserDataEntity.setUsed(1);
 
-        Email email = new Email();
+        EmailEntity email = new EmailEntity();
         email.setSented(1);
         email.setEmailSubject(CHANGE_PASSWORD_SUCCESSFULLY_SUBJECT_EMAIL);
-        email.setMessage(CHANGE_PASSWORD_SUCCESSFULLY_BODY_EMAIL.replace("user_name",user.getName()));
+        email.setMessage(CHANGE_PASSWORD_SUCCESSFULLY_BODY_EMAIL.replace("user_name", user.getName()));
         email.setDateCreated(LocalDateTime.now());
         email.setDateSented(LocalDateTime.now());
         email.setEmailAddress(user.getEmail());
         email.setUser(user);
         email.setType(EmailTypeEnum.CHANGE_PASSWORD);
 
-        AccessToken accessToken = accessTokenRepository.findByUser_IdAndIsActive(user.getId(),Boolean.TRUE).orElse(null);
+        AccessToken accessToken = accessTokenRepository.findByUser_Id(changeUserDataEntity.getUser().getId()).orElse(null);
 
-        if(accessToken == null){
+        if (accessToken == null) {
             throw new InvalidInputException("Token validation failed");
         }
 
@@ -107,7 +108,7 @@ public class ChangeUserDataService {
         userRepository.save(user);
         accessTokenRepository.save(accessToken);
 
-        emailService.sendEmail(email.getEmailAddress(),email.getUser().getName(),email.getEmailSubject(),email.getMessage());
+        emailService.sendEmail(email.getEmailAddress(), email.getUser().getName(), email.getEmailSubject(), email.getMessage());
 
         emailRepository.save(email);
         changeUserDataRepository.save(changeUserDataEntity);

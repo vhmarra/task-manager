@@ -42,7 +42,7 @@ public class ProfileService {
 
             profileRepository.saveAll(perfis);
 
-        }else {
+        } else {
 
         }
     }
@@ -50,8 +50,8 @@ public class ProfileService {
     public List<ProfileEntity> findProfileByID(Long id) throws InvalidInputException {
         ProfileEntity profile = profileRepository.findById(id).orElse(null);
 
-        if(profile == null){
-            throw new InvalidInputException("PROFILE WITH ID "+id+ " DOES NOT EXIST");
+        if (profile == null) {
+            throw new InvalidInputException("PROFILE WITH ID " + id + " DOES NOT EXIST");
         }
 
         List<ProfileEntity> profileList = new ArrayList<>();

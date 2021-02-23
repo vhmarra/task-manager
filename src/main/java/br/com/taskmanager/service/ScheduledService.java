@@ -43,11 +43,11 @@ public class ScheduledService {
     }
 
     @Scheduled(initialDelay = 1200000L, fixedRate = 1200000L)
-    public void disableTokenEvery20min(){
+    public void disableTokenEvery20min() {
         log.info("DISABLING TOKENS...");
         accessTokenRepository.findAllByIsActive(true).forEach(accessToken -> {
             try {
-                if(!accessToken.getUser().getProfiles().contains(profileService.findProfileByID(SUPER_ADM).get(0))){
+                if (!accessToken.getUser().getProfiles().contains(profileService.findProfileByID(SUPER_ADM).get(0))) {
                     accessToken.setIsActive(false);
                     accessTokenRepository.save(accessToken);
                 }

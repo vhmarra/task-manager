@@ -9,6 +9,7 @@ import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-@Transactional(rollbackFor = {Exception.class})
+@Transactional(rollbackFor = {Exception.class},propagation = Propagation.REQUIRED)
 public class TaskService extends TokenService {
 
     private final TaskRepository taskRepository;
@@ -52,7 +53,7 @@ public class TaskService extends TokenService {
         task.setTaskDescription(taskDescription);
         task.setDateCreated(LocalDateTime.now());
 
-        if(StringUtils.isEmpty(taskDeadLine)){
+        if (StringUtils.isEmpty(taskDeadLine)) {
             task.setDateEnd(LocalDateTime.MAX);
         }
         if (!StringUtils.isEmpty(taskDeadLine)) {

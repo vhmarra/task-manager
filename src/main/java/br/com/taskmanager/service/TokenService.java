@@ -8,19 +8,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
 
-    public String getAccessToken(){
+    public String getAccessToken() {
         return TokenThread.getToken().get().getToken();
     }
 
-    public UserEntity getUserEntity(){
+    public UserEntity getUserEntity() {
         return TokenThread.getToken().get().getUser();
     }
 
-    public AccessToken getAccessTokenEntity(){
+    public AccessToken getAccessTokenEntity() {
         return TokenThread.getToken().get();
     }
 
-    public Long getUserId(){
+    public Long getUserId() {
         return TokenThread.getToken().get().getUser().getId();
     }
 

@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ChangeUserDataRepository extends JpaRepository<ChangeUserDataEntity,Long> {
+public interface ChangeUserDataRepository extends JpaRepository<ChangeUserDataEntity, Long> {
 
     Optional<ChangeUserDataEntity> findByCode(String code);
+
     List<ChangeUserDataEntity> findAllByUsed(Integer used);
 
 }

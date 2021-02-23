@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Table(name = "email")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Email {
+public class EmailEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

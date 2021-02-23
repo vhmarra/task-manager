@@ -29,16 +29,16 @@ public class TaskResponse {
     @JsonProperty(value = "priority")
     private String priority;
 
-    public TaskResponse(TaskEntity task){
+    public TaskResponse(TaskEntity task) {
         this.id = task.getId();
         this.dateCreated = task.getDateCreated().toString();
         this.dateEnd = task.getDateEnd().toString();
         this.description = task.getTaskDescription();
         this.finalized = task.getFinalized().toString();
-        if(task.getPriority() == 1){
+        if (task.getPriority() == 1) {
             this.priority = "true";
         }
-        if(task.getPriority() == 0){
+        if (task.getPriority() == 0) {
             this.priority = "false";
         }
     }

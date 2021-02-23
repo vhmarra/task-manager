@@ -31,13 +31,13 @@ public class TaskController {
     @PostMapping("create-task")
     public ResponseEntity<?> createTask(@RequestHeader(name = "access-token") String token,
                                         @RequestHeader(name = "task-description") String taskDescription,
-                                        @RequestHeader(name = "task-dead-line-day",required = false) String taskDeadLine,
-                                        @RequestHeader(name = "task-dead-line-hour",required = false,defaultValue = "00") String taskDeadLineHour,
-                                        @RequestHeader(name = "task-dead-line-minute",required = false,defaultValue = "00") String taskDeadLineMinute,
-                                        @RequestHeader(name = "priority",required = false) Integer priority)
+                                        @RequestHeader(name = "task-dead-line-day", required = false) String taskDeadLine,
+                                        @RequestHeader(name = "task-dead-line-hour", required = false, defaultValue = "00") String taskDeadLineHour,
+                                        @RequestHeader(name = "task-dead-line-minute", required = false, defaultValue = "00") String taskDeadLineMinute,
+                                        @RequestHeader(name = "priority", required = false) Integer priority)
             throws TokenNotFoundException, InvalidInputException {
 
-        taskService.createTask(taskDeadLine, taskDescription,taskDeadLineHour,taskDeadLineMinute,priority);
+        taskService.createTask(taskDeadLine, taskDescription, taskDeadLineHour, taskDeadLineMinute, priority);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -47,23 +47,23 @@ public class TaskController {
                                                  @RequestHeader String newDescription,
                                                  @RequestHeader(required = false) Integer priority) throws InvalidInputException, TokenNotFoundException {
 
-        taskService.editTaskDescription(taskId,newDescription,priority);
+        taskService.editTaskDescription(taskId, newDescription, priority);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("edit-task-deadline")
     public ResponseEntity<?> editTaskDescriptionDeadLine(@RequestHeader(name = "access-token") String token,
-                                                 @RequestHeader Long taskId,
-                                                 @RequestHeader String newDeadLineDay,
-                                                 @RequestHeader(required = false,defaultValue = "00") String newDeadLineHour,
-                                                 @RequestHeader(required = false,defaultValue = "00") String newDeadLineMinute) throws InvalidInputException, TokenNotFoundException {
+                                                         @RequestHeader Long taskId,
+                                                         @RequestHeader String newDeadLineDay,
+                                                         @RequestHeader(required = false, defaultValue = "00") String newDeadLineHour,
+                                                         @RequestHeader(required = false, defaultValue = "00") String newDeadLineMinute) throws InvalidInputException, TokenNotFoundException {
 
         taskService.editTaskDeadLine(taskId, newDeadLineDay, newDeadLineHour, newDeadLineMinute);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("find-by-id")
-    public TaskResponse findById(@RequestHeader(name = "access-token") String token,@RequestHeader(name = "task-id") Long taskId) throws InvalidInputException, TokenNotFoundException {
+    public TaskResponse findById(@RequestHeader(name = "access-token") String token, @RequestHeader(name = "task-id") Long taskId) throws InvalidInputException, TokenNotFoundException {
         return taskService.findTask(taskId);
     }
 
@@ -73,7 +73,7 @@ public class TaskController {
     }
 
     @GetMapping("find-all-by-state")
-    public List<TaskResponse> findAllByState(@RequestHeader(name = "access-token") String token,@RequestHeader(name = "finalized") String finalized) throws InvalidInputException, TokenNotFoundException {
+    public List<TaskResponse> findAllByState(@RequestHeader(name = "access-token") String token, @RequestHeader(name = "finalized") String finalized) throws InvalidInputException, TokenNotFoundException {
         return taskService.findAllTaskByState(finalized);
     }
 

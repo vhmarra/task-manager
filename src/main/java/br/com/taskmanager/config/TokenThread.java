@@ -8,7 +8,7 @@ public final class TokenThread {
 
     private static ThreadLocal<AccessToken> tClocal = new ThreadLocal<>();
 
-    private TokenThread(){
+    private TokenThread() {
         super();
     }
 

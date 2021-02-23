@@ -2,7 +2,7 @@ package br.com.taskmanager.service;
 
 import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
-import br.com.taskmanager.domain.Email;
+import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
 import br.com.taskmanager.exceptions.InvalidInputException;
@@ -70,7 +70,7 @@ public class UserService extends TokenService {
         user.setBirthDate(LocalDate.parse(request.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         user.setCpf(request.getCpf());
 
-        Email emailBoasVindas = new Email();
+        EmailEntity emailBoasVindas = new EmailEntity();
         emailBoasVindas.setEmailAddress(user.getEmail());
         emailBoasVindas.setEmailSubject(user.getName() + " SEJA BEM VINDO");
         emailBoasVindas.setUser(user);
@@ -105,7 +105,7 @@ public class UserService extends TokenService {
 
         Optional<AccessToken> oldToken = accessTokenRepository.findByUser_IdAndIsActive(user.getId(), true);
 
-        if(oldToken.isEmpty()){
+        if (oldToken.isEmpty()) {
             token.setToken(DigestUtils.sha1Hex(r.ints(97, 122)
                     .limit(30L)
                     .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString()));
@@ -115,7 +115,7 @@ public class UserService extends TokenService {
             log.info("token thread {}", getAccessToken());
             accessTokenRepository.save(token);
         }
-        if(oldToken.isPresent()){
+        if (oldToken.isPresent()) {
             throw new InvalidInputException("User is authenticated");
         }
 

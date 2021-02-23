@@ -1,8 +1,8 @@
 package br.com.taskmanager.exceptions;
 
-public class InvalidInputException extends Exception{
+public class InvalidInputException extends Exception {
 
-    public InvalidInputException(String message){
+    public InvalidInputException(String message) {
         super(message);
     }
 

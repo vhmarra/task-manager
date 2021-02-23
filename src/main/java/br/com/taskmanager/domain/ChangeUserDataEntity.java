@@ -16,7 +16,8 @@ import java.time.LocalDateTime;
 @Table(name = "change_user_password")
 public class ChangeUserDataEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

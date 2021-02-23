@@ -11,9 +11,12 @@ import java.util.Optional;
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> {
 
-    Optional<AccessToken> findByTokenAndIsActive(String token,Boolean active);
+    Optional<AccessToken> findByTokenAndIsActive(String token, Boolean active);
+
     Optional<AccessToken> findByUser_Id(Long id);
-    Optional<AccessToken> findByUser_IdAndIsActive(Long id,Boolean active);
+
+    Optional<AccessToken> findByUser_IdAndIsActive(Long id, Boolean active);
+
     List<AccessToken> findAllByIsActive(Boolean active);
 
 }

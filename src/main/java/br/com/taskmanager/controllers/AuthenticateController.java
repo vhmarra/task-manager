@@ -1,12 +1,13 @@
 package br.com.taskmanager.controllers;
 
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
-import br.com.taskmanager.dtos.response.SuccessResponse;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotFoundException;
 import br.com.taskmanager.exceptions.ObjectAlreadyExistsException;
 import br.com.taskmanager.service.ChangeUserDataService;
 import br.com.taskmanager.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,14 +41,14 @@ public class AuthenticateController {
     }
 
     @PostMapping("request-change-password")
-    public ResponseEntity<?> requestChangePassword(@RequestHeader(name = "cpf") String userCpf,@RequestHeader(name = "email") String userEmail) throws InvalidInputException, MessagingException {
+    public ResponseEntity<?> requestChangePassword(@RequestHeader(name = "cpf") String userCpf, @RequestHeader(name = "email") String userEmail) throws InvalidInputException, MessagingException {
         changeUserDataService.requestChangePassword(userCpf, userEmail);
         return ResponseEntity.ok().build();
 
     }
 
     @PostMapping("change-password")
-    public ResponseEntity<?> changePassword(@RequestHeader(name = "code") String code,@RequestHeader(name = "new-pass") String newPass) throws InvalidInputException, MessagingException {
+    public ResponseEntity<?> changePassword(@RequestHeader(name = "code") String code, @RequestHeader(name = "new-pass") String newPass) throws InvalidInputException, MessagingException {
         changeUserDataService.changePassword(code, newPass);
         return ResponseEntity.ok().build();
 
