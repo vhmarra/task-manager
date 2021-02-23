@@ -41,23 +41,29 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(new HttpInterceptor(requestInterceptor, repository))
                         .addPathPatterns("/**")
-                        .excludePathPatterns("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/auth/**");
+                        .excludePathPatterns("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**" /*, "/auth/**"*/);
             }
         };
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getServletPath().contains("/task")) {
+        if (request.getServletPath().contains("/auth")){
+            return true;
+        }
+        if (request.getServletPath().contains("/task") || request.getServletPath().contains("/sync")) {
             log.info("intercepting token {}",request.getHeader("access-token"));
-            AccessToken accessToken = repository.findByToken(request.getHeader("access-token")).orElse(null);
+            AccessToken accessToken = repository.findByTokenAndIsActive(request.getHeader("access-token"),true).orElse(null);
             if(accessToken == null){
-                return false;
+                throw new TokenNotFoundException("Token is not valid");
             }
             TokenThread.setToken(accessToken);
             log.info("token {}",accessToken.getToken());
+            return true;
         }
-        return true;
+        else{
+            return false;
+        }
     }
 
     @Override

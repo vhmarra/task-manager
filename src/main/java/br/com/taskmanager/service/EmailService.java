@@ -46,8 +46,9 @@ public class EmailService {
         }
 
         Message message = prepareMessage(getSession(), emailCliente, clienteName, subjectEmail, emailBody);
+        log.info("sending email to email -> {}", emailCliente);
         Transport.send(message);
-        log.info("EMAIL ENVIADO {}", emailCliente);
+        log.info("email sented successfully to -> {}", emailCliente);
     }
 
     private Message prepareMessage(Session s, String emailCliente, String clienteName, String subjectEmail, String emailBody) throws MessagingException {

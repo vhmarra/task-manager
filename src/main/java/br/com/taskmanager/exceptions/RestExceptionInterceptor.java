@@ -42,5 +42,11 @@ public class RestExceptionInterceptor {
         return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 403L),new HttpHeaders(), FORBIDDEN);
     }
 
+    @ExceptionHandler({ NotEnoughPermissionsException.class })
+    public ResponseEntity<?> handleNotEnoughPermissionsException(Exception ex) {
+        log.error(ex.getMessage(), ex);
+        return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 403L),new HttpHeaders(), FORBIDDEN);
+    }
+
 
 }

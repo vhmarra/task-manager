@@ -7,36 +7,32 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "task")
 @Data
-public class TaskEntity {
+@Table(name = "change_user_password")
+public class ChangeUserDataEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "code")
+    private String code;
+
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
-    @Column(name = "description")
-    private String taskDescription;
+    @Column(name = "date_used")
+    private LocalDateTime dateUsed;
 
-    @Column(name = "date_end")
-    private LocalDateTime dateEnd = LocalDateTime.MAX;
+    @Column(name = "used")
+    private Integer used;
 
-    @Column(name = "finalized")
-    private Boolean finalized;
+    @ManyToOne
+    private UserEntity user;
 
-    @Column(name = "priority")
-    private Integer priority = 0;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
-    UserEntity user;
 }

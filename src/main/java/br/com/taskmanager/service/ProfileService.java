@@ -51,15 +51,13 @@ public class ProfileService {
         ProfileEntity profile = profileRepository.findById(id).orElse(null);
 
         if(profile == null){
-            throw new InvalidInputException("Perfil nao existe");
+            throw new InvalidInputException("PROFILE WITH ID "+id+ " DOES NOT EXIST");
         }
 
         List<ProfileEntity> profileList = new ArrayList<>();
         profileList.add(profile);
 
         return profileList;
-
-
 
     }
 

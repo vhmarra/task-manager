@@ -1,5 +1,6 @@
 package br.com.taskmanager.domain;
 
+import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,10 @@ public class Email {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "email_type")
+    @Enumerated(EnumType.STRING)
+    private EmailTypeEnum type;
 
     @Column(name = "message")
     private String message;
