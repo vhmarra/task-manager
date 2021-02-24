@@ -1,11 +1,13 @@
 package br.com.taskmanager.controllers;
 
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
+import br.com.taskmanager.dtos.response.SuccessResponse;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotFoundException;
 import br.com.taskmanager.exceptions.ObjectAlreadyExistsException;
 import br.com.taskmanager.service.ChangeUserDataService;
 import br.com.taskmanager.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,8 @@ public class AuthenticateController {
     }
 
     @PostMapping("sign-up")
-    public ResponseEntity<?> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
-        userService.saveUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<SuccessResponse> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, JsonProcessingException {
+        return ResponseEntity.ok(userService.saveUser(request));
     }
 
     @PostMapping("authenticate")

@@ -47,6 +47,8 @@ public class UserEntity {
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private List<ProfileEntity> profiles;
 
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Address> addresses;
 
 
 }

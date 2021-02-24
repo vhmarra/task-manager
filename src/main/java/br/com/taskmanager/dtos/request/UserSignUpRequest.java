@@ -20,4 +20,12 @@ public class UserSignUpRequest {
     @ApiParam(required = true)
     private String birthDate;
 
+    @ApiParam(required = false)
+    private String cep;
+
+    @ApiParam(required = true)
+    private Integer numero;
+
+    @ApiParam(required = false)
+    private String complemento;
 }

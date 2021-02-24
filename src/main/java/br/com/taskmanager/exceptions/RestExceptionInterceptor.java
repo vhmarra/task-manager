@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ControllerAdvice
 @Slf4j
@@ -46,6 +47,12 @@ public class RestExceptionInterceptor {
     public ResponseEntity<?> handleNotEnoughPermissionsException(Exception ex) {
         log.error(ex.getMessage(), ex);
         return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 403L),new HttpHeaders(), FORBIDDEN);
+    }
+
+    @ExceptionHandler({ ObjectNotFoundException.class })
+    public ResponseEntity<?> handleObjectNotFoundException(Exception ex) {
+        log.error(ex.getMessage(), ex);
+        return new ResponseEntity(new ExceptionResponse(ex.getMessage(), 404L),new HttpHeaders(), NOT_FOUND);
     }
 
 

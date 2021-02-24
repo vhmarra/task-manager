@@ -1,25 +1,27 @@
 package br.com.taskmanager.service;
 
 import br.com.taskmanager.domain.ChangeUserDataEntity;
-import br.com.taskmanager.domain.TaskEntity;
+import br.com.taskmanager.domain.EmailEntity;
+import br.com.taskmanager.domain.UserEntity;
+import br.com.taskmanager.exceptions.ObjectNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.ChangeUserDataRepository;
 import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.TaskRepository;
+import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
+import static br.com.taskmanager.utils.Constants.BIRTHDAY_BODY_EMAIL;
+import static br.com.taskmanager.utils.Constants.BIRTHDAY_SUBJECT_EMAIL;
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
-import static br.com.taskmanager.utils.Constants.WELCOME_BODY_EMAIL;
-import static br.com.taskmanager.utils.Constants.WELCOME_SUBJECT_EMAIL;
 
 @Service
 @EnableScheduling
@@ -31,15 +33,15 @@ public class ScheduledService {
     private final EmailRepository emailRepository;
     private final EmailService emailService;
     private final ChangeUserDataRepository changeUserDataRepository;
-    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    public ScheduledService(AccessTokenRepository accessTokenRepository, ProfileService profileService, EmailRepository emailRepository, EmailService emailService, ChangeUserDataRepository changeUserDataRepository, TaskRepository taskRepository) {
+    public ScheduledService(AccessTokenRepository accessTokenRepository, ProfileService profileService, EmailRepository emailRepository, EmailService emailService, ChangeUserDataRepository changeUserDataRepository, UserRepository userRepository) {
         this.accessTokenRepository = accessTokenRepository;
         this.profileService = profileService;
         this.emailRepository = emailRepository;
         this.emailService = emailService;
         this.changeUserDataRepository = changeUserDataRepository;
-        this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     @Scheduled(initialDelay = 1200000L, fixedRate = 1200000L)
@@ -59,24 +61,26 @@ public class ScheduledService {
         log.info("ALL TOKENS HAS BEEN DISABLE!");
     }
 
-    @Scheduled(initialDelay = 15L, fixedRate = 6000l)
+    @Scheduled(cron = "0 * * ? * *")
     public void sendAllEmails() {
-        emailRepository.findAllBySented(0).forEach(email -> {
-            if (email.getType().equals(EmailTypeEnum.WELCOME)) {
-                try {
-                    emailService.sendEmail(email.getEmailAddress(),
-                            email.getUser().getEmail(),
-                            WELCOME_SUBJECT_EMAIL,
-                            WELCOME_BODY_EMAIL.replace("user_name", email.getUser().getName()));
-                    email.setSented(1);
-                    email.setDateSented(LocalDateTime.now());
-                    emailRepository.save(email);
-                } catch (Exception e) {
-                    log.error("ERROR TO SEND EMAIL! -> {}", e.getCause());
-                }
-            }
+        List<EmailEntity> emails = emailRepository.findAllBySented(0);
+        if (emails.isEmpty()) {
+            log.warn("No emails to sent");
+        } else {
+            emails.forEach(email -> {
+                if (email.getType() != EmailTypeEnum.BIRTHDAY) {
+                    try {
+                        email.setSented(1);
+                        email.setDateSented(LocalDateTime.now());
+                        emailService.sendEmail(email);
+                        emailRepository.save(email);
 
-        });
+                    } catch (Exception e) {
+                        log.error("error {}", e.getCause().toString());
+                    }
+                }
+            });
+        }
     }
 
     @Scheduled(cron = "0 0 1 * * ?")
@@ -90,6 +94,27 @@ public class ScheduledService {
             changeUserDataRepository.save(entity);
         });
         log.info("DISABLE TOKENS JOB FINISHED!");
+    }
+
+    //@Scheduled(cron = "0 0 0 * * ?")
+    public void sendBirthdayEmail() throws ObjectNotFoundException {
+        List<UserEntity> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new ObjectNotFoundException("Error to fetch user list");
+        }
+        users.forEach(user -> {
+            if (user.getBirthDate().getMonth() == LocalDate.now().getMonth()
+                    && user.getBirthDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
+                EmailEntity email = emailService.sendEmailToUser(user, BIRTHDAY_SUBJECT_EMAIL, EmailTypeEnum.BIRTHDAY, BIRTHDAY_BODY_EMAIL.replace("user_name", user.getName()));
+                email.setSented(1);
+                try {
+                    emailService.sendEmail(email);
+                } catch (Exception e) {
+                    log.error("Error to send email {}", e.getCause().toString());
+                }
+                emailRepository.save(email);
+            }
+        });
     }
 
 }

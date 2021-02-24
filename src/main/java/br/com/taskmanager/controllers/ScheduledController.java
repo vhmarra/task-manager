@@ -2,6 +2,7 @@ package br.com.taskmanager.controllers;
 
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
+import br.com.taskmanager.exceptions.ObjectNotFoundException;
 import br.com.taskmanager.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class ScheduledController {
     }
 
     @PostMapping("force-send-email")
-    public ResponseEntity<?> forceSendEmails(@RequestHeader(name = "access-token") String accessToken) throws InvalidInputException, NotEnoughPermissionsException {
+    public ResponseEntity<?> forceSendEmails(@RequestHeader(name = "access-token") String accessToken) throws InvalidInputException, NotEnoughPermissionsException, ObjectNotFoundException {
         userService.forceSendEmail();
         return ResponseEntity.ok().build();
     }

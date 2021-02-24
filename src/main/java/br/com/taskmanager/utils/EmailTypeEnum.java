@@ -2,7 +2,7 @@ package br.com.taskmanager.utils;
 
 public enum EmailTypeEnum {
 
-    WELCOME, CHANGE_PASSWORD, PRIROTY_EMAIL
+    WELCOME, CHANGE_PASSWORD, PRIROTY_EMAIL, BIRTHDAY
 
 
 }
