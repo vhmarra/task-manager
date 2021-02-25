@@ -48,7 +48,7 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getServletPath().contains("/auth")) {
+        if (request.getServletPath().contains("/auth") || request.getServletPath().contains("/address")) {
             return true;
         }
         if (request.getServletPath().contains("/task") || request.getServletPath().contains("/sync")) {

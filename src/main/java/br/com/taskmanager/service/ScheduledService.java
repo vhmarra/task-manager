@@ -65,7 +65,7 @@ public class ScheduledService {
     public void sendAllEmails() {
         List<EmailEntity> emails = emailRepository.findAllBySented(0);
         if (emails.isEmpty()) {
-            log.warn("No emails to sent");
+            //log.warn("No emails to sent");
         } else {
             emails.forEach(email -> {
                 if (email.getType() != EmailTypeEnum.BIRTHDAY) {

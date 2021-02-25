@@ -46,7 +46,10 @@ public class UserService extends TokenService {
     private final AddressService addressService;
 
 
-    public UserService(UserRepository userRepository, ValidationService validator, ProfileService profileService, EmailRepository emailRepository, AccessTokenRepository accessTokenRepository, ScheduledService scheduledService, EmailService emailService, AddressRepository addressRepository, AddressService addressService) {
+    public UserService(UserRepository userRepository, ValidationService validator, ProfileService profileService,
+                       EmailRepository emailRepository, AccessTokenRepository accessTokenRepository,
+                       ScheduledService scheduledService, EmailService emailService,
+                       AddressRepository addressRepository, AddressService addressService) {
         this.userRepository = userRepository;
         this.validator = validator;
         this.profileService = profileService;
@@ -58,7 +61,7 @@ public class UserService extends TokenService {
         this.addressService = addressService;
     }
 
-    public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, JsonProcessingException {
+    public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
         if (userRepository.existsByCpf(request.getCpf())) {
             throw new ObjectAlreadyExistsException("User already has register");
         }
@@ -129,7 +132,7 @@ public class UserService extends TokenService {
             throw new InvalidInputException("User is authenticated");
         }
 
-        return token.getToken();
+        return getAccessToken();
 
     }
 
