@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 @Slf4j
-@Transactional(rollbackFor = {Exception.class},propagation = Propagation.REQUIRED)
 public class TaskService extends TokenService {
 
     private final TaskRepository taskRepository;
@@ -35,10 +34,10 @@ public class TaskService extends TokenService {
 
 
     public void createTask(String taskDeadLine, String taskDescription, String deadLineHour, String deadLineMinute, Integer priority) throws TokenNotFoundException, InvalidInputException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
-        if (validationService.validateDate(taskDeadLine) == false) {
+        if (!validationService.validateDate(taskDeadLine)) {
             throw new InvalidInputException("Date is invalid");
         }
         if (!deadLineHour.isBlank() && Integer.valueOf(deadLineHour) > 23 || Integer.valueOf(deadLineHour) < 0) {
@@ -79,7 +78,7 @@ public class TaskService extends TokenService {
     }
 
     public List<TaskResponse> findAllTask() throws InvalidInputException, TokenNotFoundException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
 
@@ -97,7 +96,7 @@ public class TaskService extends TokenService {
     }
 
     public void finalizeTask(Long id) throws InvalidInputException, TokenNotFoundException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
 
@@ -118,7 +117,7 @@ public class TaskService extends TokenService {
     }
 
     public List<TaskResponse> findAllTaskByState(String finalized) throws InvalidInputException, TokenNotFoundException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
 

@@ -3,10 +3,8 @@ package br.com.taskmanager.service;
 import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
-import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,22 +20,15 @@ import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
-import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
-
 @Service
 @Slf4j
 public class EmailService {
 
-    private final String login;
-    private final String senha;
-    private final Environment environment;
-    private final EmailRepository emailRepository;
 
-    public EmailService(@Value("${email.login}") String login, @Value("${email.senha}") String senha, Environment environment, EmailRepository emailRepository) {
-        this.login = login;
-        this.senha = senha;
+    private final Environment environment;
+
+    public EmailService(Environment environment) {
         this.environment = environment;
-        this.emailRepository = emailRepository;
     }
 
     public void sendEmail(EmailEntity email) throws MessagingException, InvalidInputException {
@@ -59,7 +50,7 @@ public class EmailService {
 
     private Message prepareMessage(Session s, String emailCliente, String clienteName, String subjectEmail, String emailBody) throws MessagingException {
         Message m = new MimeMessage(s);
-        m.setFrom(new InternetAddress(login));
+        m.setFrom(new InternetAddress(environment.getProperty("email.login")));
         m.setRecipient(Message.RecipientType.TO, new InternetAddress(emailCliente));
         m.setSubject(subjectEmail);
         m.setText(emailBody);

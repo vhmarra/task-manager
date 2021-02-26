@@ -16,14 +16,12 @@ import br.com.taskmanager.repository.AddressRepository;
 import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,6 +148,5 @@ public class UserService extends TokenService {
         }
         scheduledService.disableTokenEvery20min();
     }
-
 
 }

@@ -23,7 +23,7 @@ public class UserSignUpRequest {
     @ApiParam(required = false)
     private String cep;
 
-    @ApiParam(required = true)
+    @ApiParam(required = false)
     private Integer numero;
 
     @ApiParam(required = false)

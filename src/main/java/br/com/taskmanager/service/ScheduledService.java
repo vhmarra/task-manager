@@ -7,7 +7,6 @@ import br.com.taskmanager.exceptions.ObjectNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.ChangeUserDataRepository;
 import br.com.taskmanager.repository.EmailRepository;
-import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static br.com.taskmanager.utils.Constants.BIRTHDAY_BODY_EMAIL;
 import static br.com.taskmanager.utils.Constants.BIRTHDAY_SUBJECT_EMAIL;
@@ -96,25 +96,28 @@ public class ScheduledService {
         log.info("DISABLE TOKENS JOB FINISHED!");
     }
 
-    //@Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void sendBirthdayEmail() throws ObjectNotFoundException {
         List<UserEntity> users = userRepository.findAll();
         if (users.isEmpty()) {
             throw new ObjectNotFoundException("Error to fetch user list");
         }
-        users.forEach(user -> {
-            if (user.getBirthDate().getMonth() == LocalDate.now().getMonth()
-                    && user.getBirthDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
-                EmailEntity email = emailService.sendEmailToUser(user, BIRTHDAY_SUBJECT_EMAIL, EmailTypeEnum.BIRTHDAY, BIRTHDAY_BODY_EMAIL.replace("user_name", user.getName()));
-                email.setSented(1);
-                try {
-                    emailService.sendEmail(email);
-                } catch (Exception e) {
-                    log.error("Error to send email {}", e.getCause().toString());
-                }
-                emailRepository.save(email);
+        users.stream()
+                .filter(user -> user.getBirthDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()
+                        && user.getBirthDate().getMonth() == LocalDate.now().getMonth())
+                .collect(Collectors.toList()).forEach(userEntity -> {
+            EmailEntity email = emailService
+                    .sendEmailToUser(userEntity,
+                            BIRTHDAY_SUBJECT_EMAIL, EmailTypeEnum.BIRTHDAY,
+                            BIRTHDAY_BODY_EMAIL.replace("user_name", userEntity.getName()));
+            email.setSented(1);
+            email.setDateSented(LocalDateTime.now());
+            try {
+                emailService.sendEmail(email);
+            } catch (Exception e) {
+                log.error("Error to send email {}", e.getCause().toString());
             }
+            emailRepository.save(email);
         });
     }
-
 }
