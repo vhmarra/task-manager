@@ -144,7 +144,7 @@ public class UserService extends TokenService {
 
     public void forceDisableTokens() throws NotEnoughPermissionsException, InvalidInputException {
         if (!getUserEntity().getProfiles().contains(profileService.findProfileByID(SUPER_ADM).get(0))) {
-            throw new NotEnoughPermissionsException("No permission for this action found!!!");
+            throw new NotEnoughPermissionsException("No permission for this action found!!");
         }
         scheduledService.disableTokenEvery20min();
     }
