@@ -1,6 +1,8 @@
 package br.com.taskmanager.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,11 +12,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -42,13 +42,15 @@ public class UserEntity {
     private LocalDate birthDate;
 
     @OneToMany
-    List<TaskEntity> tasks;
+    private List<TaskEntity> tasks;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<ProfileEntity> profiles;
 
-    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany
+    private List<AddressEntity> addresses;
 
 
 }

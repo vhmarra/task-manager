@@ -2,10 +2,12 @@ package br.com.taskmanager.service;
 
 import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
-import br.com.taskmanager.domain.Address;
+import br.com.taskmanager.domain.AddressEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
+import br.com.taskmanager.dtos.request.UserUpdateAddressRequest;
 import br.com.taskmanager.dtos.response.SuccessResponse;
+import br.com.taskmanager.exceptions.ExternalApiException;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
 import br.com.taskmanager.exceptions.NotFoundException;
@@ -22,8 +24,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
 import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
@@ -76,7 +80,7 @@ public class UserService extends TokenService {
         UserEntity user = new UserEntity();
         user.setCpf(request.getCpf());
 
-        List<Address> userAddres = addressService.getAddressByCep(request.getCep(),request.getNumero().toString(), request.getComplemento());
+        List<AddressEntity> userAddres = addressService.getAddressByCep(request.getCep(),request.getNumero().toString(), request.getComplemento());
         if(!userAddres.isEmpty()){
             user.setAddresses(userAddres);
             addressRepository.save(userAddres.get(0));
@@ -131,6 +135,33 @@ public class UserService extends TokenService {
         }
 
         return getAccessToken();
+
+    }
+
+    //TODO rever isso aqui
+    public void updateUserAddress(String token,UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException {
+        TokenThread.setToken(accessTokenRepository.findByTokenAndIsActive(token,true).orElse(null));
+
+        List<AddressEntity> addressEntities = addressRepository.findAllById(addressRepository.findAddressIdByUserId(getUserId()));
+        if(addressEntities
+                .stream()
+                .anyMatch(address -> address.getLogradouro().contains(request.getNumero().toString())
+                        && address.getCep().equalsIgnoreCase(request.getCep()))){
+            throw new InvalidInputException("User already have this address");
+
+        }else {
+            List<AddressEntity> addressEntityList = addressService.getAddressByCep(request.getCep(),request.getNumero().toString(),request.getComplemento());
+            if(addressEntities.isEmpty()){
+                throw new ExternalApiException("Error to find Address with cep: " +request.getCep());
+            }
+            UserEntity user = userRepository.findById(getUserId()).orElse(null);
+            List<AddressEntity> addressEntity = addressRepository.saveAll(addressEntityList);
+            user.setAddresses(addressEntity);
+            userRepository.save(user);
+
+
+        }
+
 
     }
 

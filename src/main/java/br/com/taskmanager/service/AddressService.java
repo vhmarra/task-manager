@@ -1,6 +1,6 @@
 package br.com.taskmanager.service;
 
-import br.com.taskmanager.domain.Address;
+import br.com.taskmanager.domain.AddressEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +17,14 @@ public class AddressService {
 
     public static String VIA_CEP_URL = "https://viacep.com.br/ws/"+"user_cep"+"/json/";
 
-    public List<Address> getAddressByCep(String cep, String numero, String complemento) {
+    public List<AddressEntity> getAddressByCep(String cep, String numero, String complemento) {
         RestTemplate restTemplate = new RestTemplate();
         String url = VIA_CEP_URL.replace("user_cep",cep);
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ResponseEntity<?> response = restTemplate.getForEntity(url, String.class);
-            Address address = objectMapper.readValue(response.getBody().toString(),Address.class);
+            AddressEntity address = objectMapper.readValue(response.getBody().toString(), AddressEntity.class);
             if(!complemento.isBlank()){
                 address.setComplemento(complemento);
             }

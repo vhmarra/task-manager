@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Table(name = "address")
 @Entity
 @Data
-public class Address {
+public class AddressEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
