@@ -73,15 +73,15 @@ public class UserService extends TokenService {
         if (!validator.validateEmail(request.getEmail())) {
             throw new InvalidInputException("email invalid");
         }
-        if (request.getNumero() < 0){
+        if (request.getNumero() < 0) {
             throw new InvalidInputException("address number is invalid");
         }
 
         UserEntity user = new UserEntity();
         user.setCpf(request.getCpf());
 
-        List<AddressEntity> userAddres = addressService.getAddressByCep(request.getCep(),request.getNumero().toString(), request.getComplemento());
-        if(!userAddres.isEmpty()){
+        List<AddressEntity> userAddres = addressService.getAddressByCep(request.getCep(), request.getNumero().toString(), request.getComplemento());
+        if (!userAddres.isEmpty()) {
             user.setAddresses(userAddres);
             addressRepository.save(userAddres.get(0));
         }
@@ -102,12 +102,12 @@ public class UserService extends TokenService {
 
         userRepository.save(user);
         accessTokenRepository.save(token);
-        emailRepository.save(emailService.sendEmailToUser(user,(user.getName() + " SEJA BEM VINDO"),WELCOME,"Seja bem vindo ao seu gerenciador de tasks"));
+        emailRepository.save(emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks"));
 
-        if(userAddres.isEmpty()){
-            return new SuccessResponse("Usuario cadastrado com sucesso, mas com endereço incompleto",1101L);
-        }else {
-            return new SuccessResponse("Usuario cadastrado com sucesso",1102L);
+        if (userAddres.isEmpty()) {
+            return new SuccessResponse("Usuario cadastrado com sucesso, mas com endereço incompleto", 1101L);
+        } else {
+            return new SuccessResponse("Usuario cadastrado com sucesso", 1102L);
         }
     }
 
@@ -139,24 +139,30 @@ public class UserService extends TokenService {
     }
 
     //TODO rever isso aqui
-    public void updateUserAddress(String token,UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException {
-        TokenThread.setToken(accessTokenRepository.findByTokenAndIsActive(token,true).orElse(null));
+    public void updateUserAddress(String token, UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException {
+        TokenThread.setToken(accessTokenRepository.findByTokenAndIsActive(token, true).orElse(null));
 
         List<AddressEntity> addressEntities = addressRepository.findAllById(addressRepository.findAddressIdByUserId(getUserId()));
-        if(addressEntities
+        if (addressEntities
                 .stream()
                 .anyMatch(address -> address.getLogradouro().contains(request.getNumero().toString())
-                        && address.getCep().equalsIgnoreCase(request.getCep()))){
+                        && address.getCep().equalsIgnoreCase(request.getCep()))) {
             throw new InvalidInputException("User already have this address");
 
-        }else {
-            List<AddressEntity> addressEntityList = addressService.getAddressByCep(request.getCep(),request.getNumero().toString(),request.getComplemento());
-            if(addressEntities.isEmpty()){
-                throw new ExternalApiException("Error to find Address with cep: " +request.getCep());
+        } else {
+            List<AddressEntity> addressEntityList = addressService.getAddressByCep(request.getCep(), request.getNumero().toString(), request.getComplemento());
+            if (addressEntities.isEmpty()) {
+                throw new ExternalApiException("Error to find Address with cep: " + request.getCep());
             }
             UserEntity user = userRepository.findById(getUserId()).orElse(null);
-            List<AddressEntity> addressEntity = addressRepository.saveAll(addressEntityList);
-            user.setAddresses(addressEntity);
+            if (user == null){
+                throw new NotFoundException("User not found");
+            }
+
+                List<AddressEntity> addressEntity = addressRepository.saveAll(addressEntityList);
+            List<AddressEntity> userAddresses = user.getAddresses();
+            userAddresses.add(addressEntityList.get(0));
+            user.setAddresses(userAddresses);
             userRepository.save(user);
 
 
