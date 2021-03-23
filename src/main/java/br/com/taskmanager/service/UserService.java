@@ -3,10 +3,13 @@ package br.com.taskmanager.service;
 import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.domain.AddressEntity;
+import br.com.taskmanager.domain.TaskEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
 import br.com.taskmanager.dtos.request.UserUpdateAddressRequest;
 import br.com.taskmanager.dtos.response.SuccessResponse;
+import br.com.taskmanager.dtos.response.TaskResponse;
+import br.com.taskmanager.dtos.response.UserResponse;
 import br.com.taskmanager.exceptions.ExternalApiException;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
@@ -16,6 +19,7 @@ import br.com.taskmanager.exceptions.ObjectNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.AddressRepository;
 import br.com.taskmanager.repository.EmailRepository;
+import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +28,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
 import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
@@ -46,12 +49,13 @@ public class UserService extends TokenService {
     private final EmailService emailService;
     private final AddressRepository addressRepository;
     private final AddressService addressService;
+    private final TaskRepository taskRepository;
 
 
     public UserService(UserRepository userRepository, ValidationService validator, ProfileService profileService,
                        EmailRepository emailRepository, AccessTokenRepository accessTokenRepository,
                        ScheduledService scheduledService, EmailService emailService,
-                       AddressRepository addressRepository, AddressService addressService) {
+                       AddressRepository addressRepository, AddressService addressService, TaskRepository taskRepository) {
         this.userRepository = userRepository;
         this.validator = validator;
         this.profileService = profileService;
@@ -61,6 +65,7 @@ public class UserService extends TokenService {
         this.emailService = emailService;
         this.addressRepository = addressRepository;
         this.addressService = addressService;
+        this.taskRepository = taskRepository;
     }
 
     public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
@@ -105,8 +110,10 @@ public class UserService extends TokenService {
         emailRepository.save(emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks"));
 
         if (userAddres.isEmpty()) {
+            log.info("Usuario cadastrado com sucesso, mas com endereço incompleto", 1101L);
             return new SuccessResponse("Usuario cadastrado com sucesso, mas com endereço incompleto", 1101L);
         } else {
+            log.info("Usuario cadastrado com sucesso", 1102L);
             return new SuccessResponse("Usuario cadastrado com sucesso", 1102L);
         }
     }
@@ -155,24 +162,49 @@ public class UserService extends TokenService {
                 throw new ExternalApiException("Error to find Address with cep: " + request.getCep());
             }
             UserEntity user = userRepository.findById(getUserId()).orElse(null);
-            if (user == null){
+            if (user == null) {
                 throw new NotFoundException("User not found");
             }
 
-                List<AddressEntity> addressEntity = addressRepository.saveAll(addressEntityList);
+            addressRepository.saveAll(addressEntityList);
             List<AddressEntity> userAddresses = user.getAddresses();
             userAddresses.add(addressEntityList.get(0));
             user.setAddresses(userAddresses);
             userRepository.save(user);
-
-
         }
-
-
     }
 
-    public void forceSendEmail() throws InvalidInputException, NotEnoughPermissionsException, ObjectNotFoundException {
-        if (!getUserEntity().getProfiles().contains(profileService.findProfileByID(SUPER_ADM).get(0))) {
+    public List<UserResponse> findAllUser() throws NotEnoughPermissionsException {
+        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
+            throw new NotEnoughPermissionsException("No permission for this action found!!!");
+        }
+        List<UserEntity> allUsers = userRepository.findAll();
+        List<UserResponse> responses = new ArrayList<>();
+        List<TaskResponse> taskResponses = new ArrayList<>();
+
+        allUsers.forEach(user -> {
+            UserResponse userResponse = new UserResponse();
+            userResponse.setAddresses(user.getAddresses());
+            userResponse.setName(user.getName());
+            userResponse.setEmail(user.getEmail());
+            userResponse.setCpf(user.getCpf());
+            userResponse.setBirthDate(user.getBirthDate());
+            userResponse.setPassword("**************");
+            userResponse.setId(user.getId());
+            userResponse.setProfiles(user.getProfiles());
+            List<TaskEntity> userTask = taskRepository.findAllByUser_Id(user.getId());
+            userTask.forEach(task -> {
+                TaskResponse taskResponse = new TaskResponse(task);
+                taskResponses.add(taskResponse);
+            });
+            userResponse.setTasks(taskResponses);
+            responses.add(userResponse);
+        });
+        return responses;
+    }
+
+    public void forceSendEmail() throws NotEnoughPermissionsException, ObjectNotFoundException {
+        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
             throw new NotEnoughPermissionsException("No permission for this action found!!!");
         }
         scheduledService.sendAllEmails();
@@ -180,8 +212,8 @@ public class UserService extends TokenService {
     }
 
     public void forceDisableTokens() throws NotEnoughPermissionsException, InvalidInputException {
-        if (!getUserEntity().getProfiles().contains(profileService.findProfileByID(SUPER_ADM).get(0))) {
-            throw new NotEnoughPermissionsException("No permission for this action found!!");
+        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
+            throw new NotEnoughPermissionsException("No permission for this action found!!!");
         }
         scheduledService.disableTokenEvery20min();
     }

@@ -1,7 +1,11 @@
 package br.com.taskmanager.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.File;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +31,9 @@ public class TaskEntity {
 
     @Column(name = "description")
     private String taskDescription;
+
+    @Column(name = "task_image")
+    private File image;
 
     @Column(name = "date_end")
     private LocalDateTime dateEnd = LocalDateTime.MAX;

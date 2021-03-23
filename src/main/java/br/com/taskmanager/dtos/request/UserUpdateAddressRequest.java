@@ -9,9 +9,9 @@ public class UserUpdateAddressRequest {
     @ApiParam(required = true)
     private String cep;
 
-    @ApiParam(required = false,defaultValue = " ")
+    @ApiParam(required = true,defaultValue = "")
     private Integer numero;
 
-    @ApiParam(required = false,defaultValue = " ")
+    @ApiParam(required = false,defaultValue = "")
     private String complemento;
 }

@@ -41,6 +41,7 @@ public class UserEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+
     @OneToMany
     private List<TaskEntity> tasks;
 

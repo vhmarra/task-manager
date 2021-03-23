@@ -50,7 +50,9 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
         if (request.getServletPath().contains("/auth") || request.getServletPath().contains("/address")) {
             return true;
         }
-        if (request.getServletPath().contains("/task") || request.getServletPath().contains("/sync")) {
+        if (request.getServletPath().contains("/task")
+                || request.getServletPath().contains("/sync")
+                || request.getServletPath().contains("/user")) {
             log.info("intercepting token {}", request.getHeader("access-token"));
             AccessToken accessToken = repository.findByTokenAndIsActive(request.getHeader("access-token"), true).orElse(null);
             if (accessToken == null) {

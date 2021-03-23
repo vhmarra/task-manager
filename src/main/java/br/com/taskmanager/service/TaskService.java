@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -33,7 +36,7 @@ public class TaskService extends TokenService {
     }
 
 
-    public void createTask(String taskDeadLine, String taskDescription, String deadLineHour, String deadLineMinute, Integer priority) throws TokenNotFoundException, InvalidInputException {
+    public void createTask(String taskDeadLine, String taskDescription, String deadLineHour, String deadLineMinute, Integer priority) throws TokenNotFoundException, InvalidInputException, IOException {
         if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
@@ -48,7 +51,6 @@ public class TaskService extends TokenService {
         }
 
         TaskEntity task = new TaskEntity();
-
         task.setTaskDescription(taskDescription);
         task.setDateCreated(LocalDateTime.now());
 
