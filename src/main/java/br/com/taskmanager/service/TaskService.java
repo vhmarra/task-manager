@@ -38,7 +38,7 @@ public class TaskService extends TokenService {
 
     public void createTask(String taskDeadLine, String taskDescription, String deadLineHour, String deadLineMinute, Integer priority) throws TokenNotFoundException, InvalidInputException, IOException {
         if (!getAccessTokenEntity().getIsActive()) {
-            throw new TokenNotFoundException("Token is invalid");
+            throw new TokenNotFoundException("Token is invalid!");
         }
         if (!validationService.validateDate(taskDeadLine)) {
             throw new InvalidInputException("Date is invalid");
