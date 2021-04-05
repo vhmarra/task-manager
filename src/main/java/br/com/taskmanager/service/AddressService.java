@@ -29,7 +29,7 @@ public class AddressService {
                 address.setComplemento(complemento);
             }
             address.setLogradouro(address.getLogradouro()+ " "+numero);
-            log.info("ENDEREÇO ENCONTRADO -> {}",address);
+            log.info("ENDEREÇO ENCONTRADO->{}",address);
             return Arrays.asList(address);
         } catch (Exception e){
             return new ArrayList<>();
