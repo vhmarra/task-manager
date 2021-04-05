@@ -44,7 +44,7 @@ public class ScheduledService {
         this.userRepository = userRepository;
     }
 
-    @Scheduled(initialDelay = 1200000L, fixedRate = 1200000L)
+    @Scheduled(initialDelay = 100L, fixedRate = 1200000L)
     public void disableTokenEvery20min() {
         log.info("DISABLING TOKENS...");
         accessTokenRepository.findAllByIsActive(true).forEach(accessToken -> {
@@ -76,7 +76,7 @@ public class ScheduledService {
                         emailRepository.save(email);
 
                     } catch (Exception e) {
-                        log.error("error {}", e.getCause().toString());
+                        log.error("error", e.getCause());
                     }
                 }
             });
@@ -119,5 +119,20 @@ public class ScheduledService {
             }
             emailRepository.save(email);
         });
+    }
+
+    @Scheduled(initialDelay = 1L,fixedDelay = 10000L)
+    public void disableOldDataChangeToken(){
+        List<ChangeUserDataEntity> changeUserDataEntityList = changeUserDataRepository.findAllByUsed(0);
+        if (!changeUserDataEntityList.isEmpty()){
+            changeUserDataEntityList.forEach(token->{
+                if (LocalDateTime.now().getMinute() - token.getDateCreated().getMinute()  >= 15){
+                    token.setDateUsed(LocalDateTime.now());
+                    token.setUsed(1);
+                    changeUserDataRepository.save(token);
+                    log.info("All tokens are disable after 15 minutes");
+                }
+            });
+        }
     }
 }

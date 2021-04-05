@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ChangeUserDataRepository extends JpaRepository<ChangeUserDataEntity, Long> {
 
-    Optional<ChangeUserDataEntity> findByCode(String code);
+    Optional<ChangeUserDataEntity> findByCodeAndUsed(String code,Integer used);
 
     List<ChangeUserDataEntity> findAllByUsed(Integer used);
 

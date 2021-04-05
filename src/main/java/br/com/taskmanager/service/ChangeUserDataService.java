@@ -12,12 +12,15 @@ import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import br.com.taskmanager.utils.TokenUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static br.com.taskmanager.utils.Constants.CHANGE_PASSWORD_BODY_EMAIL;
@@ -27,6 +30,7 @@ import static br.com.taskmanager.utils.Constants.CHANGE_PASSWORD_SUCCESSFULLY_SU
 import static br.com.taskmanager.utils.TokenUtils.generateEmailToken;
 
 @Service
+@Slf4j
 public class ChangeUserDataService {
 
     private final UserRepository userRepository;
@@ -52,6 +56,7 @@ public class ChangeUserDataService {
         }
 
         String code = generateEmailToken(user);
+        log.info("code {}",code);
 
         ChangeUserDataEntity changeUserDataEntity = new ChangeUserDataEntity();
         changeUserDataEntity.setUser(user);
@@ -67,33 +72,34 @@ public class ChangeUserDataService {
     }
 
     public void changePassword(String code, String newPassword) throws InvalidInputException, MessagingException {
-        ChangeUserDataEntity changeUserDataEntity = changeUserDataRepository.findByCode(code).orElse(null);
+        ChangeUserDataEntity changeUserDataEntity = changeUserDataRepository.findByCodeAndUsed(code,0).orElse(null);
 
         if (changeUserDataEntity == null || changeUserDataEntity.getUsed().equals(1)) {
             throw new InvalidInputException("Invalid code, try again!");
         }
 
         UserEntity user = changeUserDataEntity.getUser();
-        user.setPassword(DigestUtils.sha512Hex(newPassword));
+        user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
 
         changeUserDataEntity.setDateUsed(LocalDateTime.now());
         changeUserDataEntity.setUsed(1);
 
-        AccessToken accessToken = accessTokenRepository.findByUser_Id(changeUserDataEntity.getUser().getId()).orElse(null);
+        List<AccessToken> accessToken = accessTokenRepository.findAllByUser_Id(changeUserDataEntity.getUser().getId());
 
-        if (accessToken == null) {
-            throw new InvalidInputException("Token validation failed");
-        }
-
-        accessToken.setIsActive(false);
+        accessToken.forEach(token->{
+            if (token.getIsActive().equals(true)){
+                token.setIsActive(false);
+            }
+        });
 
         userRepository.save(user);
-        accessTokenRepository.save(accessToken);
+        accessTokenRepository.saveAll(accessToken);
         changeUserDataRepository.save(changeUserDataEntity);
         emailRepository.save(emailService.sendEmailToUser(user,
                 CHANGE_PASSWORD_SUCCESSFULLY_SUBJECT_EMAIL,
                 EmailTypeEnum.CHANGE_PASSWORD,CHANGE_PASSWORD_SUCCESSFULLY_BODY_EMAIL
                         .replace("user_name", user.getName())));
+        log.info("Senha do usuario {} alterada com sucesso",user.getName());
 
     }
 

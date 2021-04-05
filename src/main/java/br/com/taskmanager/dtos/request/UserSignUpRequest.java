@@ -20,10 +20,10 @@ public class UserSignUpRequest {
     @ApiParam(required = true)
     private String birthDate;
 
-    @ApiParam(required = false)
+    @ApiParam(required = false,defaultValue = "0000000")
     private String cep;
 
-    @ApiParam(required = false)
+    @ApiParam(required = false,defaultValue = "0")
     private Integer numero;
 
     @ApiParam(required = false)

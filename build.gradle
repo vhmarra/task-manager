@@ -5,8 +5,8 @@ plugins {
 }
 
 group = 'br.com.taskmanager'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+version = '0.8.8'
+sourceCompatibility = 13
 
 configurations {
 	compileOnly {
@@ -36,6 +36,11 @@ dependencies {
 	compile("io.springfox:springfox-swagger-ui:2.9.2")
 	compile group: 'io.swagger', name: 'swagger-models', version: '1.6.2'
 	compile ('commons-codec:commons-codec:1.15')
+
+    implementation group: 'at.favre.lib', name: 'bcrypt', version: '0.9.0'
+    implementation group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
+
+
 }
 
 test {

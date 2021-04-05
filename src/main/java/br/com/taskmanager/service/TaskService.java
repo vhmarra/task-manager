@@ -146,7 +146,7 @@ public class TaskService extends TokenService {
     }
 
     public void finalizeAllTasks() throws TokenNotFoundException, InvalidInputException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
         List<TaskEntity> tasks = taskRepository.findAllByUser_IdAndFinalized(getUserId(), false);
@@ -162,7 +162,7 @@ public class TaskService extends TokenService {
     }
 
     public TaskResponse findTask(Long taskId) throws TokenNotFoundException, InvalidInputException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
         TaskEntity taskEntity = taskRepository.findById(taskId).orElse(null);
@@ -178,7 +178,7 @@ public class TaskService extends TokenService {
     }
 
     public void editTaskDescription(Long taskId, String newDescription, Integer priority) throws TokenNotFoundException, InvalidInputException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
         TaskEntity taskEntity = taskRepository.findById(taskId).orElse(null);
@@ -203,7 +203,7 @@ public class TaskService extends TokenService {
     }
 
     public void editTaskDeadLine(Long taskId, String newDeadLineDay, String newDeadLineHour, String newDeadLineMinute) throws TokenNotFoundException, InvalidInputException {
-        if (getAccessTokenEntity().getIsActive() == false) {
+        if (!getAccessTokenEntity().getIsActive()) {
             throw new TokenNotFoundException("Token is invalid");
         }
         TaskEntity taskEntity = taskRepository.findById(taskId).orElse(null);

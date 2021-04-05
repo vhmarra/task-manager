@@ -3,6 +3,7 @@ package br.com.taskmanager.service;
 import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.domain.AddressEntity;
+import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.TaskEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
@@ -24,8 +25,12 @@ import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -68,6 +73,7 @@ public class UserService extends TokenService {
         this.taskRepository = taskRepository;
     }
 
+    @Transactional
     public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
         if (userRepository.existsByCpf(request.getCpf())) {
             throw new ObjectAlreadyExistsException("User already has register");
@@ -94,7 +100,7 @@ public class UserService extends TokenService {
         //TODO USADO PARA TESTES
         user.setEmail("marravh@gmail.com");
 
-        user.setPassword(DigestUtils.sha512Hex(request.getPassword()));
+        user.setPassword(BCrypt.hashpw(request.getPassword(),BCrypt.gensalt()));
         user.setName(request.getName());
         user.setProfiles(profileService.findProfileByID(Constants.ROLE_USER));
         user.setBirthDate(LocalDate.parse(request.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -107,7 +113,8 @@ public class UserService extends TokenService {
 
         userRepository.save(user);
         accessTokenRepository.save(token);
-        emailRepository.save(emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks"));
+        EmailEntity e = emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks");
+        emailRepository.save(e);
 
         if (userAddres.isEmpty()) {
             log.info("Usuario cadastrado com sucesso, mas com endereço incompleto", 1101L);
@@ -119,12 +126,17 @@ public class UserService extends TokenService {
     }
 
     public String authenticateUser(String cpf, String pass) throws NotFoundException, InvalidInputException {
-        UserEntity user = userRepository.findByCpfAndPassword(cpf, DigestUtils.sha512Hex(pass)).orElse(null);
+        UserEntity user = userRepository.findByCpf(cpf).orElse(null);
 
         if (user == null) {
             log.error("user with cpf {} not found", pass);
             throw new NotFoundException("CPF or Password are invalid");
         }
+        if (!BCrypt.checkpw(pass,user.getPassword())){
+            log.error("Invalid password");
+            throw new NotFoundException("Invalid credencials");
+        }
+
 
         Optional<AccessToken> oldToken = accessTokenRepository.findByUser_IdAndIsActive(user.getId(), true);
         AccessToken token = new AccessToken();

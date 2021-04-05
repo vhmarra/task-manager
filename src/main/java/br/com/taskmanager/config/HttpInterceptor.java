@@ -29,11 +29,6 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
     }
 
     @Bean
-    public HttpInterceptor myCustomHandlerInterceptor() {
-        return new HttpInterceptor(requestInterceptor, repository);
-    }
-
-    @Bean
     public WebMvcConfigurerAdapter adapter() {
         return new WebMvcConfigurerAdapter() {
             @Override
@@ -47,13 +42,13 @@ public class HttpInterceptor extends WebRequestHandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getServletPath().contains("/auth") || request.getServletPath().contains("/address")) {
+        if (request.getServletPath().contains("/auth")) {
             return true;
         }
         if (request.getServletPath().contains("/task")
                 || request.getServletPath().contains("/sync")
-                || request.getServletPath().contains("/user")) {
-            log.info("intercepting token {}", request.getHeader("access-token"));
+                || request.getServletPath().contains("/user")
+                || request.getServletPath().contains("/address")) {
             AccessToken accessToken = repository.findByTokenAndIsActive(request.getHeader("access-token"), true).orElse(null);
             if (accessToken == null) {
                 throw new TokenNotFoundException("Token is not valid");
