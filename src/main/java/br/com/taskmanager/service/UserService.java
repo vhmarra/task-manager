@@ -30,14 +30,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.mail.MessagingException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
+import static br.com.taskmanager.utils.EmailTypeEnum.CHANGE_ADDRESS;
 import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
 import static br.com.taskmanager.utils.TokenUtils.generateToken;
 
@@ -158,7 +161,7 @@ public class UserService extends TokenService {
     }
 
     //TODO rever isso aqui
-    public void updateUserAddress(String token, UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException {
+    public void updateUserAddress(String token, UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException {
         TokenThread.setToken(accessTokenRepository.findByTokenAndIsActive(token, true).orElse(null));
 
         List<AddressEntity> addressEntities = addressRepository.findAllById(addressRepository.findAddressIdByUserId(getUserId()));
@@ -183,6 +186,17 @@ public class UserService extends TokenService {
             userAddresses.add(addressEntityList.get(0));
             user.setAddresses(userAddresses);
             userRepository.save(user);
+
+            EmailEntity email = new EmailEntity();
+            email.setEmailAddress(user.getEmail());
+            email.setUser(user);
+            email.setDateCreated(LocalDateTime.now());
+            email.setType(CHANGE_ADDRESS);
+            email.setMessage("Seu endereço foi alterado com sucesso");
+            email.setEmailSubject("Seu endereço foi alterado!");
+            emailService.sendEmailNow(email);
+
+
             log.info("Endereço atualizado para o usuario: {{} {}}",user.getName(),user.getCpf());
         }
     }

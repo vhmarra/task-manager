@@ -4,5 +4,6 @@ public enum EmailTypeEnum {
     WELCOME,
     CHANGE_PASSWORD,
     PRIORITY_EMAIL,
-    BIRTHDAY
+    BIRTHDAY,
+    CHANGE_ADDRESS
 }

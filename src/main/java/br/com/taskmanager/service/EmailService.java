@@ -3,6 +3,7 @@ package br.com.taskmanager.service;
 import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
+import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -18,7 +19,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Properties;
 
 @Service
@@ -27,9 +27,11 @@ public class EmailService {
 
 
     private final Environment environment;
+    private final EmailRepository emailRepository;
 
-    public EmailService(Environment environment) {
+    public EmailService(Environment environment, EmailRepository emailRepository) {
         this.environment = environment;
+        this.emailRepository = emailRepository;
     }
 
     public void sendEmail(EmailEntity email) throws MessagingException, InvalidInputException {
@@ -91,5 +93,11 @@ public class EmailService {
 
        return email;
 
+    }
+    public void sendEmailNow(EmailEntity email) throws InvalidInputException, MessagingException {
+        email.setSented(1);
+        email.setDateSented(LocalDateTime.now());
+        emailRepository.save(email);
+        this.sendEmail(email);
     }
 }

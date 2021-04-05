@@ -3,6 +3,7 @@ package br.com.taskmanager.controllers;
 import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.domain.AddressEntity;
 import br.com.taskmanager.dtos.request.UserUpdateAddressRequest;
+import br.com.taskmanager.dtos.response.SuccessResponse;
 import br.com.taskmanager.exceptions.ExternalApiException;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
@@ -11,6 +12,7 @@ import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.service.AddressService;
 import br.com.taskmanager.service.ProfileService;
 import br.com.taskmanager.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
@@ -54,9 +57,9 @@ public class AddressController {
     }
 
     @PostMapping("update-user-address")
-    public ResponseEntity<?> getUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException {
+    public ResponseEntity<?> getUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException {
         userService.updateUserAddress(token,request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Endereço alterado com sucesso",201L));
     }
 
     @GetMapping("get-all-addresses")
