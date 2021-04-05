@@ -49,6 +49,20 @@ public class AddressEntity {
     @Column(name = "siafi")
     private String siafi;
 
+    public String toStringNoId() {
+        return "AddressEntity{" +
+                "cep='" + cep + '\'' +
+                ", logradouro='" + logradouro + '\'' +
+                ", complemento='" + complemento + '\'' +
+                ", bairro='" + bairro + '\'' +
+                ", localidade='" + localidade + '\'' +
+                ", uf='" + uf + '\'' +
+                ", ibge='" + ibge + '\'' +
+                ", gia='" + gia + '\'' +
+                ", ddd='" + ddd + '\'' +
+                ", siafi='" + siafi + '\'' +
+                '}';
+    }
 }
 
 

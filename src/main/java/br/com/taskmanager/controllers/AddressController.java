@@ -58,4 +58,9 @@ public class AddressController {
         userService.updateUserAddress(token,request);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("get-all-addresses")
+    public ResponseEntity<List<AddressEntity>> getAllAddresses(@RequestHeader(name = "access-token") String token) throws NotFoundException {
+        return ResponseEntity.ok(service.getAllUserAddresses());
+    }
 }

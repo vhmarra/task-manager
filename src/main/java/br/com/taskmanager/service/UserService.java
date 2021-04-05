@@ -183,6 +183,7 @@ public class UserService extends TokenService {
             userAddresses.add(addressEntityList.get(0));
             user.setAddresses(userAddresses);
             userRepository.save(user);
+            log.info("Endereço atualizado para o usuario: {{} {}}",user.getName(),user.getCpf());
         }
     }
 
