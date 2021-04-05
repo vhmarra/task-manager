@@ -129,7 +129,7 @@ public class UserService extends TokenService {
         UserEntity user = userRepository.findByCpf(cpf).orElse(null);
 
         if (user == null) {
-            log.error("user with cpf {} not found", pass);
+            log.error("user with cpf {} not found", cpf);
             throw new NotFoundException("CPF or Password are invalid");
         }
         if (!BCrypt.checkpw(pass,user.getPassword())){
