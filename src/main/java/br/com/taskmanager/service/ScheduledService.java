@@ -72,7 +72,7 @@ public class ScheduledService {
                     try {
                         email.setSented(1);
                         email.setDateSented(LocalDateTime.now());
-                        emailService.sendEmail(email);
+                        emailService.sendEmail(email,"");
                         emailRepository.save(email);
 
                     } catch (Exception e) {
@@ -113,7 +113,7 @@ public class ScheduledService {
             email.setSented(1);
             email.setDateSented(LocalDateTime.now());
             try {
-                emailService.sendEmail(email);
+                emailService.sendEmail(email,"");
             } catch (Exception e) {
                 log.error("Error to send email {}", e.getCause().toString());
             }
@@ -135,4 +135,5 @@ public class ScheduledService {
             });
         }
     }
+
 }

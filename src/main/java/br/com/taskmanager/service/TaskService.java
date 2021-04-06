@@ -76,7 +76,8 @@ public class TaskService extends TokenService {
         task.setUser(getUserEntity());
 
 
-        taskRepository.save(task);
+        TaskEntity t = taskRepository.save(task);
+        log.info("Task criada com sucesso -> {}",t.toStringNoUser());
     }
 
     public List<TaskResponse> findAllTask() throws InvalidInputException, TokenNotFoundException {

@@ -32,9 +32,6 @@ public class TaskEntity {
     @Column(name = "description")
     private String taskDescription;
 
-    @Column(name = "task_image")
-    private File image;
-
     @Column(name = "date_end")
     private LocalDateTime dateEnd = LocalDateTime.MAX;
 
@@ -47,4 +44,15 @@ public class TaskEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     UserEntity user;
+
+    public String toStringNoUser() {
+        return "Task {" +
+                "id=" + id +
+                ", dateCreated=" + dateCreated +
+                ", taskDescription='" + taskDescription + '\'' +
+                ", dateEnd=" + dateEnd +
+                ", finalized=" + finalized +
+                ", priority=" + priority +
+                '}';
+    }
 }

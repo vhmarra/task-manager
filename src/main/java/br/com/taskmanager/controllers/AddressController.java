@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.List;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
@@ -57,7 +58,7 @@ public class AddressController {
     }
 
     @PostMapping("update-user-address")
-    public ResponseEntity<?> getUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException {
+    public ResponseEntity<?> getUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException, IOException {
         userService.updateUserAddress(token,request);
         return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Endereço alterado com sucesso",201L));
     }

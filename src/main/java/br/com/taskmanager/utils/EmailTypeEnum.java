@@ -5,5 +5,6 @@ public enum EmailTypeEnum {
     CHANGE_PASSWORD,
     PRIORITY_EMAIL,
     BIRTHDAY,
-    CHANGE_ADDRESS
+    CHANGE_ADDRESS,
+    REQUEST_USER_DATA
 }

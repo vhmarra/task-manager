@@ -13,4 +13,5 @@ public interface AddressRepository extends JpaRepository<AddressEntity,Long> {
 
     @Query(value = "select addresses_id from user_addresses where user_entity_id = :id",nativeQuery = true)
     List<Long> findAddressIdByUserId(@Param("id") Long id);
+
 }

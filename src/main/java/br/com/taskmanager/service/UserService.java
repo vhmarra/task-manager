@@ -23,14 +23,19 @@ import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
+import ch.qos.logback.core.util.StringCollectionUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +46,7 @@ import java.util.Optional;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
 import static br.com.taskmanager.utils.EmailTypeEnum.CHANGE_ADDRESS;
+import static br.com.taskmanager.utils.EmailTypeEnum.REQUEST_USER_DATA;
 import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
 import static br.com.taskmanager.utils.TokenUtils.generateToken;
 
@@ -161,7 +167,7 @@ public class UserService extends TokenService {
     }
 
     //TODO rever isso aqui
-    public void updateUserAddress(String token, UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException {
+    public void updateUserAddress(String token, UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException, IOException {
         TokenThread.setToken(accessTokenRepository.findByTokenAndIsActive(token, true).orElse(null));
 
         List<AddressEntity> addressEntities = addressRepository.findAllById(addressRepository.findAddressIdByUserId(getUserId()));
@@ -194,7 +200,7 @@ public class UserService extends TokenService {
             email.setType(CHANGE_ADDRESS);
             email.setMessage("Seu endereço foi alterado com sucesso");
             email.setEmailSubject("Seu endereço foi alterado!");
-            emailService.sendEmailNow(email);
+            emailService.sendEmailNow(email,"");
 
 
             log.info("Endereço atualizado para o usuario: {{} {}}",user.getName(),user.getCpf());
@@ -245,4 +251,19 @@ public class UserService extends TokenService {
         scheduledService.disableTokenEvery20min();
     }
 
+    public void sendUserDataToAdmEmail() throws NotEnoughPermissionsException, InvalidInputException, MessagingException, IOException {
+        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
+            throw new NotEnoughPermissionsException("No permission for this action found!!!");
+        }
+        List<UserEntity> users = userRepository.findAll();
+        EmailEntity email = new EmailEntity();
+        email.setEmailAddress(getUserEntity().getEmail());
+        email.setUser(getUserEntity());
+        email.setDateCreated(LocalDateTime.now());
+        email.setType(REQUEST_USER_DATA);
+        email.setEmailSubject("Dados");
+        email.setMessage("Dados em anexo");
+        emailService.sendEmailNow(email, users.toString());
+
+    }
 }
