@@ -43,7 +43,7 @@ public class ChangeUserDataService {
     }
 
     @Transactional
-    public void requestChangePassword(String userCpf, String userEmailConfirm) throws InvalidInputException, MessagingException {
+    public void requestChangePassword(String userCpf, String userEmailConfirm) throws InvalidInputException {
         UserEntity user = userRepository.findByCpf(userCpf).orElse(null);
 
         if (user == null || !user.getEmail().equalsIgnoreCase(userEmailConfirm)) {
@@ -65,7 +65,7 @@ public class ChangeUserDataService {
                         .replace("user_name", user.getName()).replace("c_pass", code)));
     }
 
-    public void changePassword(String code, String newPassword) throws InvalidInputException, MessagingException {
+    public void changePassword(String code, String newPassword) throws InvalidInputException {
         ChangeUserDataEntity changeUserDataEntity = changeUserDataRepository.findByCodeAndUsed(code,0).orElse(null);
 
         if (changeUserDataEntity == null || changeUserDataEntity.getUsed().equals(1)) {
