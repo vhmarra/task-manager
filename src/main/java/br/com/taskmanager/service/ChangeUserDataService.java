@@ -1,9 +1,7 @@
 package br.com.taskmanager.service;
 
-import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.domain.ChangeUserDataEntity;
-import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.repository.AccessTokenRepository;
@@ -11,9 +9,7 @@ import br.com.taskmanager.repository.ChangeUserDataRepository;
 import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
-import br.com.taskmanager.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static br.com.taskmanager.utils.Constants.CHANGE_PASSWORD_BODY_EMAIL;
 import static br.com.taskmanager.utils.Constants.CHANGE_PASSWORD_SUBJECT_EMAIL;
@@ -56,7 +51,6 @@ public class ChangeUserDataService {
         }
 
         String code = generateEmailToken(user);
-        log.info("code {}",code);
 
         ChangeUserDataEntity changeUserDataEntity = new ChangeUserDataEntity();
         changeUserDataEntity.setUser(user);
@@ -91,7 +85,6 @@ public class ChangeUserDataService {
                 token.setIsActive(false);
             }
         });
-
         userRepository.save(user);
         accessTokenRepository.saveAll(accessToken);
         changeUserDataRepository.save(changeUserDataEntity);

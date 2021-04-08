@@ -255,7 +255,7 @@ public class UserService extends TokenService {
         if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
             throw new NotEnoughPermissionsException("No permission for this action found!!!");
         }
-        List<UserEntity> users = userRepository.findAll();
+
         EmailEntity email = new EmailEntity();
         email.setEmailAddress(getUserEntity().getEmail());
         email.setUser(getUserEntity());
@@ -263,7 +263,7 @@ public class UserService extends TokenService {
         email.setType(REQUEST_USER_DATA);
         email.setEmailSubject("Dados");
         email.setMessage("Dados em anexo");
-        emailService.sendEmailNow(email, users.toString());
+        emailService.sendEmailNow(email, findAllUser().toString());
 
     }
 }
