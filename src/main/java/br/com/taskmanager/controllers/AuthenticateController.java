@@ -7,10 +7,6 @@ import br.com.taskmanager.exceptions.NotFoundException;
 import br.com.taskmanager.exceptions.ObjectAlreadyExistsException;
 import br.com.taskmanager.service.ChangeUserDataService;
 import br.com.taskmanager.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,13 +22,14 @@ public class AuthenticateController {
     private final UserService userService;
     private final ChangeUserDataService changeUserDataService;
 
+
     public AuthenticateController(UserService userService, ChangeUserDataService changeUserDataService) {
         this.userService = userService;
         this.changeUserDataService = changeUserDataService;
     }
 
     @PostMapping("sign-up")
-    public ResponseEntity<SuccessResponse> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, JsonProcessingException {
+    public ResponseEntity<SuccessResponse> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
         return ResponseEntity.ok(userService.saveUser(request));
     }
 

@@ -58,7 +58,7 @@ public class AddressController {
     }
 
     @PostMapping("update-user-address")
-    public ResponseEntity<?> getUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException, IOException {
+    public ResponseEntity<?> updateUserAddress(@RequestHeader(name = "access-token") String token, @RequestAttribute @ModelAttribute UserUpdateAddressRequest request) throws InvalidInputException, ExternalApiException, NotFoundException, MessagingException, IOException {
         userService.updateUserAddress(token,request);
         return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse("Endereço alterado com sucesso",201L));
     }

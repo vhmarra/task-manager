@@ -6,7 +6,10 @@ import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +29,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.beans.BeanProperty;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -37,8 +41,8 @@ import java.util.Properties;
 
 @Service
 @Slf4j
-public class EmailService {
 
+public class EmailService {
 
     private final Environment environment;
     private final EmailRepository emailRepository;

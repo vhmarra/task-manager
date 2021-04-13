@@ -14,7 +14,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -65,6 +64,7 @@ public class ChangeUserDataService {
                         .replace("user_name", user.getName()).replace("c_pass", code)));
     }
 
+    @Transactional
     public void changePassword(String code, String newPassword) throws InvalidInputException {
         ChangeUserDataEntity changeUserDataEntity = changeUserDataRepository.findByCodeAndUsed(code,0).orElse(null);
 

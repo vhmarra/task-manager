@@ -75,7 +75,7 @@ public class UserService extends TokenService {
         this.taskRepository = taskRepository;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
         if (userRepository.existsByCpf(request.getCpf())) {
             throw new ObjectAlreadyExistsException("User already has register");
@@ -113,10 +113,15 @@ public class UserService extends TokenService {
         token.setUser(user);
         token.setIsActive(false);
 
-        userRepository.save(user);
-        accessTokenRepository.save(token);
-        EmailEntity e = emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks");
-        emailRepository.save(e);
+        try {
+            userRepository.save(user);
+            accessTokenRepository.save(token);
+            EmailEntity e = emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks");
+            emailRepository.save(e);
+        } catch (Exception e){
+            log.error("Erro ao salvar novo usuario {}",user.getName());
+            throw e;
+        }
 
         if (userAddres.isEmpty()) {
             log.info("Usuario cadastrado com sucesso, mas com endereço incompleto", 1101L);

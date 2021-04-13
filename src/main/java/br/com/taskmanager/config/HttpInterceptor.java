@@ -4,6 +4,7 @@ import br.com.taskmanager.domain.AccessToken;
 import br.com.taskmanager.exceptions.TokenNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.WebRequestInterceptor;

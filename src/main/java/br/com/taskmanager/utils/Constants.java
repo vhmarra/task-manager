@@ -2,6 +2,7 @@ package br.com.taskmanager.utils;
 
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.UtilityClass;
+import org.springframework.context.annotation.Profile;
 
 @UtilityClass
 @FieldNameConstants
@@ -24,4 +25,5 @@ public class Constants {
     public static final String BIRTHDAY_BODY_EMAIL = "user_name tenha um feliz aniversário cheio de sorrisos e gargalhadas, repleto de paz, amor e muita alegria. Parabéns por mais um ano de vida!";
 
     public static final String VIA_CEP_URL = "https://viacep.com.br/ws/"+"user_cep"+"/json/";
+
 }
