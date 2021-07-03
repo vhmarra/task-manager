@@ -3,13 +3,11 @@ package br.com.taskmanager.service;
 import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
+import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
 import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -24,25 +22,20 @@ import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.beans.BeanProperty;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 @Service
 @Slf4j
-
-public class EmailService {
+public class EmailService extends TokenService {
 
     private final Environment environment;
     private final EmailRepository emailRepository;
@@ -149,5 +142,19 @@ public class EmailService {
         email.setDateSented(LocalDateTime.now());
         emailRepository.save(email);
         this.sendEmail(email,toAttach);
+    }
+
+    public void sendEmailById(Long id) throws InvalidInputException, NotEnoughPermissionsException, MessagingException, IOException {
+        if (getUserEntity().getProfiles().size() < 3) {
+            log.error("Usuario sem permissao");
+            throw new NotEnoughPermissionsException("Usuario sem permissao");
+        }
+
+        var email = emailRepository
+                .findByIdAndSentedNot(id,1)
+                .orElseThrow(() -> new InvalidInputException("Email ja enviado"));
+
+        sendEmailNow(email,"");
+
     }
 }

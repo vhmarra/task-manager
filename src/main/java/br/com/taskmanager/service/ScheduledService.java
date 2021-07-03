@@ -61,7 +61,7 @@ public class ScheduledService {
         log.info("ALL TOKENS HAS BEEN DISABLE!");
     }
 
-    @Scheduled(cron = "0 * * ? * *")
+    //@Scheduled(cron = "0 * * ? * *")
     public void sendAllEmails() {
         List<EmailEntity> emails = emailRepository.findAllBySented(0);
         if (emails.isEmpty()) {
