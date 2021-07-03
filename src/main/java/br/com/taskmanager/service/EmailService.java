@@ -104,22 +104,19 @@ public class EmailService extends TokenService {
     }
 
     private Session getSession() {
-        Session s = Session.getInstance(getPropriets(), new Authenticator() {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(properties, new Authenticator() {
+
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(environment.getProperty("email.login"), environment.getProperty("email.senha"));
             }
         });
-        return s;
-    }
-
-    private Properties getPropriets() {
-        Properties p = new Properties();
-        p.put("mail.smtp.auth", "true");
-        p.put("mail.smtp.starttls.enable", "true");
-        p.put("mail.smtp.host", "smtp.gmail.com");
-        p.put("mail.smtp.port", "587");
-        return p;
+        return session;
     }
 
     public EmailEntity sendEmailToUser(UserEntity user, String emailSubject, EmailTypeEnum emailTypeEnum, String emailMessage){
