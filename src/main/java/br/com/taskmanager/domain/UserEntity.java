@@ -49,9 +49,5 @@ public class UserEntity {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<ProfileEntity> profiles;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToMany
-    private List<AddressEntity> addresses;
-
 
 }

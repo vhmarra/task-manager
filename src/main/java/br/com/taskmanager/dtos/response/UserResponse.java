@@ -1,6 +1,5 @@
 package br.com.taskmanager.dtos.response;
 
-import br.com.taskmanager.domain.AddressEntity;
 import br.com.taskmanager.domain.ProfileEntity;
 import lombok.Data;
 
@@ -18,6 +17,5 @@ public class UserResponse {
     private LocalDate birthDate;
     private List<TaskResponse> tasks;
     private List<ProfileEntity> profiles;
-    private List<AddressEntity> addresses;
 
 }
