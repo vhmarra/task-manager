@@ -2,20 +2,16 @@ package br.com.taskmanager.service;
 
 import br.com.taskmanager.config.TokenThread;
 import br.com.taskmanager.domain.AccessToken;
-import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.TaskEntity;
 import br.com.taskmanager.domain.UserEntity;
+import br.com.taskmanager.exceptions.*;
+import br.com.taskmanager.integration.IntegrationSendEmailRequest;
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
 import br.com.taskmanager.dtos.response.SuccessResponse;
 import br.com.taskmanager.dtos.response.TaskResponse;
 import br.com.taskmanager.dtos.response.UserResponse;
-import br.com.taskmanager.exceptions.InvalidInputException;
-import br.com.taskmanager.exceptions.NotEnoughPermissionsException;
-import br.com.taskmanager.exceptions.NotFoundException;
-import br.com.taskmanager.exceptions.ObjectAlreadyExistsException;
-import br.com.taskmanager.exceptions.ObjectNotFoundException;
+import br.com.taskmanager.integration.SendEmailIntegrationService;
 import br.com.taskmanager.repository.AccessTokenRepository;
-import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
@@ -24,18 +20,13 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
-import static br.com.taskmanager.utils.EmailTypeEnum.REQUEST_USER_DATA;
-import static br.com.taskmanager.utils.EmailTypeEnum.WELCOME;
 import static br.com.taskmanager.utils.TokenUtils.generateToken;
 
 @Service
@@ -45,30 +36,25 @@ public class UserService extends TokenService {
     private final UserRepository userRepository;
     private final ValidationService validator;
     private final ProfileService profileService;
-    private final EmailRepository emailRepository;
     private final AccessTokenRepository accessTokenRepository;
     private final ScheduledService scheduledService;
-    private final EmailService emailService;
-
     private final TaskRepository taskRepository;
-
+    private final SendEmailIntegrationService emailIntegrationService;
 
     public UserService(UserRepository userRepository, ValidationService validator, ProfileService profileService,
-                       EmailRepository emailRepository, AccessTokenRepository accessTokenRepository,
-                       ScheduledService scheduledService, EmailService emailService,
-                       TaskRepository taskRepository) {
+                       AccessTokenRepository accessTokenRepository,
+                       ScheduledService scheduledService, TaskRepository taskRepository, SendEmailIntegrationService emailIntegrationService) {
         this.userRepository = userRepository;
         this.validator = validator;
         this.profileService = profileService;
-        this.emailRepository = emailRepository;
         this.accessTokenRepository = accessTokenRepository;
         this.scheduledService = scheduledService;
-        this.emailService = emailService;
         this.taskRepository = taskRepository;
+        this.emailIntegrationService = emailIntegrationService;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
+    public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, ExternalApiException {
         if (userRepository.existsByCpf(request.getCpf())) {
             throw new ObjectAlreadyExistsException("User already has register");
         }
@@ -103,8 +89,12 @@ public class UserService extends TokenService {
         try {
             userRepository.save(user);
             accessTokenRepository.save(token);
-            EmailEntity e = emailService.sendEmailToUser(user, (user.getName() + " SEJA BEM VINDO"), WELCOME, "Seja bem vindo ao seu gerenciador de tasks");
-            emailRepository.save(e);
+            var email = new IntegrationSendEmailRequest();
+            email.setEmailTo(user.getEmail());
+            email.setSubject(user.getName() + " SEJA BEM VINDO");
+            email.setMessage("Seja bem vindo ao seu gerenciador de tasks");
+            emailIntegrationService.sendEmail(email);
+
         } catch (Exception e) {
             log.error("Erro ao salvar novo usuario {}", user.getName());
             throw e;
@@ -175,13 +165,6 @@ public class UserService extends TokenService {
         return responses;
     }
 
-    public void forceSendEmail() throws NotEnoughPermissionsException, ObjectNotFoundException {
-        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
-            throw new NotEnoughPermissionsException("No permission for this action found!!!");
-        }
-        scheduledService.sendAllEmails();
-        scheduledService.sendBirthdayEmail();
-    }
 
     public void forceDisableTokens() throws NotEnoughPermissionsException, InvalidInputException {
         if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
@@ -190,19 +173,4 @@ public class UserService extends TokenService {
         scheduledService.disableTokenEvery20min();
     }
 
-    public void sendUserDataToAdmEmail() throws NotEnoughPermissionsException, InvalidInputException, MessagingException, IOException {
-        if (!getUserEntity().getProfiles().stream().anyMatch(profile -> profile.getId().equals(SUPER_ADM))) {
-            throw new NotEnoughPermissionsException("No permission for this action found!!!");
-        }
-
-        EmailEntity email = new EmailEntity();
-        email.setEmailAddress(getUserEntity().getEmail());
-        email.setUser(getUserEntity());
-        email.setDateCreated(LocalDateTime.now());
-        email.setType(REQUEST_USER_DATA);
-        email.setEmailSubject("Dados");
-        email.setMessage("Dados em anexo");
-        emailService.sendEmailNow(email, findAllUser().toString());
-
-    }
 }

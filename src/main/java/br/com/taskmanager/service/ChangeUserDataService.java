@@ -6,7 +6,6 @@ import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.ChangeUserDataRepository;
-import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +28,11 @@ public class ChangeUserDataService {
 
     private final UserRepository userRepository;
     private final ChangeUserDataRepository changeUserDataRepository;
-    private final EmailService emailService;
-    private final EmailRepository emailRepository;
     private final AccessTokenRepository accessTokenRepository;
 
-    public ChangeUserDataService(UserRepository userRepository, ChangeUserDataRepository changeUserDataRepository, EmailService emailService, EmailRepository emailRepository, AccessTokenRepository accessTokenRepository) {
+    public ChangeUserDataService(UserRepository userRepository, ChangeUserDataRepository changeUserDataRepository,AccessTokenRepository accessTokenRepository) {
         this.userRepository = userRepository;
         this.changeUserDataRepository = changeUserDataRepository;
-        this.emailService = emailService;
-        this.emailRepository = emailRepository;
         this.accessTokenRepository = accessTokenRepository;
     }
 
@@ -58,10 +53,10 @@ public class ChangeUserDataService {
         changeUserDataEntity.setCode(code);
 
         changeUserDataRepository.save(changeUserDataEntity);
-        emailRepository.save(emailService.sendEmailToUser(user,
-                CHANGE_PASSWORD_SUBJECT_EMAIL,
-                EmailTypeEnum.CHANGE_PASSWORD,CHANGE_PASSWORD_BODY_EMAIL
-                        .replace("user_name", user.getName()).replace("c_pass", code)));
+//        emailRepository.save(emailService.sendEmailToUser(user,
+//                CHANGE_PASSWORD_SUBJECT_EMAIL,
+//                EmailTypeEnum.CHANGE_PASSWORD,CHANGE_PASSWORD_BODY_EMAIL
+//                        .replace("user_name", user.getName()).replace("c_pass", code)));
     }
 
     @Transactional
@@ -88,10 +83,10 @@ public class ChangeUserDataService {
         userRepository.save(user);
         accessTokenRepository.saveAll(accessToken);
         changeUserDataRepository.save(changeUserDataEntity);
-        emailRepository.save(emailService.sendEmailToUser(user,
-                CHANGE_PASSWORD_SUCCESSFULLY_SUBJECT_EMAIL,
-                EmailTypeEnum.CHANGE_PASSWORD,CHANGE_PASSWORD_SUCCESSFULLY_BODY_EMAIL
-                        .replace("user_name", user.getName())));
+//        emailRepository.save(emailService.sendEmailToUser(user,
+//                CHANGE_PASSWORD_SUCCESSFULLY_SUBJECT_EMAIL,
+//                EmailTypeEnum.CHANGE_PASSWORD,CHANGE_PASSWORD_SUCCESSFULLY_BODY_EMAIL
+//                        .replace("user_name", user.getName())));
         log.info("Senha do usuario {} alterada com sucesso",user.getName());
 
     }

@@ -20,7 +20,7 @@ public class TokenService {
         return TokenThread.getToken().get();
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return TokenThread.getToken().get().getUser().getId();
     }
 

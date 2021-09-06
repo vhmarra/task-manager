@@ -2,11 +2,14 @@ package br.com.taskmanager.controllers;
 
 import br.com.taskmanager.dtos.request.UserSignUpRequest;
 import br.com.taskmanager.dtos.response.SuccessResponse;
+import br.com.taskmanager.exceptions.ExternalApiException;
 import br.com.taskmanager.exceptions.InvalidInputException;
 import br.com.taskmanager.exceptions.NotFoundException;
 import br.com.taskmanager.exceptions.ObjectAlreadyExistsException;
 import br.com.taskmanager.service.ChangeUserDataService;
 import br.com.taskmanager.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,19 +20,14 @@ import javax.mail.MessagingException;
 
 @RestController
 @RequestMapping("auth")
+@AllArgsConstructor
 public class AuthenticateController {
 
     private final UserService userService;
     private final ChangeUserDataService changeUserDataService;
 
-
-    public AuthenticateController(UserService userService, ChangeUserDataService changeUserDataService) {
-        this.userService = userService;
-        this.changeUserDataService = changeUserDataService;
-    }
-
     @PostMapping("sign-up")
-    public ResponseEntity<SuccessResponse> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException {
+    public ResponseEntity<SuccessResponse> singUp(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, ExternalApiException {
         return ResponseEntity.ok(userService.saveUser(request));
     }
 

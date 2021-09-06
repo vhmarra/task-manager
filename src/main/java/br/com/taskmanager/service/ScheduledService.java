@@ -1,12 +1,10 @@
 package br.com.taskmanager.service;
 
 import br.com.taskmanager.domain.ChangeUserDataEntity;
-import br.com.taskmanager.domain.EmailEntity;
 import br.com.taskmanager.domain.UserEntity;
 import br.com.taskmanager.exceptions.ObjectNotFoundException;
 import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.ChangeUserDataRepository;
-import br.com.taskmanager.repository.EmailRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.EmailTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -30,18 +28,13 @@ public class ScheduledService {
 
     private final AccessTokenRepository accessTokenRepository;
     private final ProfileService profileService;
-    private final EmailRepository emailRepository;
-    private final EmailService emailService;
     private final ChangeUserDataRepository changeUserDataRepository;
-    private final UserRepository userRepository;
 
-    public ScheduledService(AccessTokenRepository accessTokenRepository, ProfileService profileService, EmailRepository emailRepository, EmailService emailService, ChangeUserDataRepository changeUserDataRepository, UserRepository userRepository) {
+    public ScheduledService(AccessTokenRepository accessTokenRepository, ProfileService profileService, ChangeUserDataRepository changeUserDataRepository) {
         this.accessTokenRepository = accessTokenRepository;
         this.profileService = profileService;
-        this.emailRepository = emailRepository;
-        this.emailService = emailService;
         this.changeUserDataRepository = changeUserDataRepository;
-        this.userRepository = userRepository;
+
     }
 
     @Scheduled(initialDelay = 100L, fixedRate = 1200000L)
@@ -61,28 +54,6 @@ public class ScheduledService {
         log.info("ALL TOKENS HAS BEEN DISABLE!");
     }
 
-    //@Scheduled(cron = "0 * * ? * *")
-    public void sendAllEmails() {
-        List<EmailEntity> emails = emailRepository.findAllBySented(0);
-        if (emails.isEmpty()) {
-            //log.warn("No emails to sent");
-        } else {
-            emails.forEach(email -> {
-                if (email.getType() != EmailTypeEnum.BIRTHDAY) {
-                    try {
-                        email.setSented(1);
-                        email.setDateSented(LocalDateTime.now());
-                        emailService.sendEmail(email,"");
-                        emailRepository.save(email);
-
-                    } catch (Exception e) {
-                        log.error("error", e.getCause());
-                    }
-                }
-            });
-        }
-    }
-
     @Scheduled(cron = "0 0 1 * * ?")
     public void disableALlChangeDataTokens() {
         log.info("STARTING DISABLE TOKENS JOB...");
@@ -96,30 +67,6 @@ public class ScheduledService {
         log.info("DISABLE TOKENS JOB FINISHED!");
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void sendBirthdayEmail() throws ObjectNotFoundException {
-        List<UserEntity> users = userRepository.findAll();
-        if (users.isEmpty()) {
-            throw new ObjectNotFoundException("Error to fetch user list");
-        }
-        users.stream()
-                .filter(user -> user.getBirthDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()
-                        && user.getBirthDate().getMonth() == LocalDate.now().getMonth())
-                .collect(Collectors.toList()).forEach(userEntity -> {
-            EmailEntity email = emailService
-                    .sendEmailToUser(userEntity,
-                            BIRTHDAY_SUBJECT_EMAIL, EmailTypeEnum.BIRTHDAY,
-                            BIRTHDAY_BODY_EMAIL.replace("user_name", userEntity.getName()));
-            email.setSented(1);
-            email.setDateSented(LocalDateTime.now());
-            try {
-                emailService.sendEmail(email,"");
-            } catch (Exception e) {
-                log.error("Error to send email {}", e.getCause().toString());
-            }
-            emailRepository.save(email);
-        });
-    }
 
     @Scheduled(initialDelay = 1L,fixedDelay = 10000L)
     public void disableOldDataChangeToken(){

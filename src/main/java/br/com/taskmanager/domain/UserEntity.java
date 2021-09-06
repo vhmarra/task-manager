@@ -16,15 +16,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Data
 @Table(name = "user")
 public class UserEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "id")
-    private Long id;
+    private String id = UUID.randomUUID().toString();
 
     @Column(name = "name")
     private String name;

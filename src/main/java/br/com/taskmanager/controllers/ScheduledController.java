@@ -20,12 +20,6 @@ public class ScheduledController {
         this.userService = userService;
     }
 
-    @PostMapping("force-send-email")
-    public ResponseEntity<?> forceSendEmails(@RequestHeader(name = "access-token") String accessToken) throws InvalidInputException, NotEnoughPermissionsException, ObjectNotFoundException {
-        userService.forceSendEmail();
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("force-disable-tokens")
     public ResponseEntity<?> forceDisableTokens(@RequestHeader(name = "access-token") String accessToken) throws InvalidInputException, NotEnoughPermissionsException {
         userService.forceDisableTokens();
