@@ -17,6 +17,7 @@ public class FeatureService {
         this.featureRepository = featureRepository;
     }
 
+    //FIXME fix this to include all toggle in a migration .sql archive on application initialization
     @Scheduled(initialDelay = 10L, fixedRate = 6000000000000000000L)
     public void createFeature() {
         log.info("Generating sql for features");
