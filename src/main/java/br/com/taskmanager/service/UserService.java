@@ -17,6 +17,7 @@ import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.taskmanager.service.ValidationService.isValidatePassword;
 import static br.com.taskmanager.utils.Constants.SUPER_ADM;
 import static br.com.taskmanager.utils.TokenUtils.generateToken;
 
@@ -106,15 +108,11 @@ public class UserService extends TokenService {
     }
 
     public String authenticateUser(String cpf, String pass) throws NotFoundException, InvalidInputException {
-        UserEntity user = userRepository.findByCpf(cpf).orElse(null);
+        UserEntity user = userRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("CPF or Password are invalid"));
 
-        if (user == null) {
-            log.error("user with cpf {} not found", cpf);
-            throw new NotFoundException("CPF or Password are invalid");
-        }
-        if (!BCrypt.checkpw(pass, user.getPassword())) {
-            log.error("Invalid password");
-            throw new NotFoundException("Invalid credencials");
+        if (!isValidatePassword(pass, user)) {
+            log.error("Password wrong");
+            throw new InvalidInputException("Invalid input");
         }
 
 

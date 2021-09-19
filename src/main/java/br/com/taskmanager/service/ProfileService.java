@@ -2,8 +2,10 @@ package br.com.taskmanager.service;
 
 import br.com.taskmanager.domain.ProfileEntity;
 import br.com.taskmanager.exceptions.InvalidInputException;
+import br.com.taskmanager.repository.FeatureRepository;
 import br.com.taskmanager.repository.ProfileRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -60,5 +62,7 @@ public class ProfileService {
         return profileList;
 
     }
+
+
 
 }

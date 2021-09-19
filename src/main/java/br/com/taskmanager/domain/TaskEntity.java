@@ -16,6 +16,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 @Entity
 @Table(name = "task")
@@ -23,9 +26,8 @@ import java.time.LocalDateTime;
 public class TaskEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id = randomUUID().toString();
 
     @Column(name = "date_created")
     private LocalDateTime dateCreated;

@@ -8,15 +8,18 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 @Entity
 @Data
 @Table(name = "log")
 public class LogEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "id")
-    private Long id;
+    private String id = randomUUID().toString();
 
     @Column(name = "description")
     private String description;

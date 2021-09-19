@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class TaskResponse {
 
     @JsonProperty(value = "task-id")
-    private Long id;
+    private String id;
 
     @JsonProperty(value = "date-end")
     private String dateEnd;

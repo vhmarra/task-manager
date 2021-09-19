@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
+
 @Entity
 @Data
 @Table(name = "user")
@@ -25,7 +27,7 @@ public class UserEntity {
 
     @Id
     @Column(name = "id")
-    private String id = UUID.randomUUID().toString();
+    private String id = randomUUID().toString();
 
     @Column(name = "name")
     private String name;
