@@ -37,7 +37,8 @@ public class ScheduledService {
 
     }
 
-    @Scheduled(initialDelay = 100L, fixedRate = 1200000L)
+    //FIXME remove this method in further implementations
+    //@Scheduled(initialDelay = 100L, fixedRate = 1200000L)
     public void disableTokenEvery20min() {
         log.info("DISABLING TOKENS...");
         accessTokenRepository.findAllByIsActive(true).forEach(accessToken -> {
