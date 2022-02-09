@@ -18,7 +18,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByCpf(String cpf);
 
-    @Query(value = "select * from user join task t on user.id = t.user_id",nativeQuery = true)
-    List<UserEntity> findAllJoinFetch();
-
 }

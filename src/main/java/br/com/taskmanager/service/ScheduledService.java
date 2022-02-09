@@ -55,7 +55,7 @@ public class ScheduledService {
         log.info("ALL TOKENS HAS BEEN DISABLE!");
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
+    //@Scheduled(cron = "0 0 1 * * ?")
     public void disableALlChangeDataTokens() {
         log.info("STARTING DISABLE TOKENS JOB...");
         List<ChangeUserDataEntity> changeUserDataEntityList = changeUserDataRepository.findAllByUsed(0);
@@ -69,7 +69,7 @@ public class ScheduledService {
     }
 
 
-    @Scheduled(initialDelay = 1L,fixedDelay = 10000L)
+    //@Scheduled(initialDelay = 1L,fixedDelay = 10000L)
     public void disableOldDataChangeToken(){
         List<ChangeUserDataEntity> changeUserDataEntityList = changeUserDataRepository.findAllByUsed(0);
         if (!changeUserDataEntityList.isEmpty()){

@@ -15,6 +15,7 @@ import br.com.taskmanager.repository.AccessTokenRepository;
 import br.com.taskmanager.repository.TaskRepository;
 import br.com.taskmanager.repository.UserRepository;
 import br.com.taskmanager.utils.Constants;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.context.annotation.Lazy;
@@ -33,6 +34,7 @@ import static br.com.taskmanager.utils.TokenUtils.generateToken;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService extends TokenService {
 
     private final UserRepository userRepository;
@@ -43,17 +45,6 @@ public class UserService extends TokenService {
     private final TaskRepository taskRepository;
     private final SendEmailIntegrationService emailIntegrationService;
 
-    public UserService(UserRepository userRepository, ValidationService validator, ProfileService profileService,
-                       AccessTokenRepository accessTokenRepository,
-                       ScheduledService scheduledService, TaskRepository taskRepository, SendEmailIntegrationService emailIntegrationService) {
-        this.userRepository = userRepository;
-        this.validator = validator;
-        this.profileService = profileService;
-        this.accessTokenRepository = accessTokenRepository;
-        this.scheduledService = scheduledService;
-        this.taskRepository = taskRepository;
-        this.emailIntegrationService = emailIntegrationService;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public SuccessResponse saveUser(UserSignUpRequest request) throws InvalidInputException, ObjectAlreadyExistsException, ExternalApiException {

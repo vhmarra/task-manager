@@ -22,7 +22,7 @@ import static java.util.UUID.randomUUID;
 
 @Entity
 @Data
-@Table(name = "user")
+@Table(name="\"User\"")
 public class UserEntity {
 
     @Id
