@@ -1,1 +1,2 @@
-docker run --name some-postgres -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+To run the app paste the following command on the terminal:
+$ docker-compose up
